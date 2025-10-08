@@ -1,0 +1,14 @@
+[Sun 10/05/2025 14:01:38.61] Menjalankan laporanpenjualan:reset-harian 
+✅ Laporan penjualan driver hari ini berhasil direset. Total: 5
+[Sun 10/05/2025 14:01:38.61] Menjalankan laporanproduksi:reset-harian 
+✅ Laporan produksi hari ini berhasil direset. Total: 3
+[Sun 10/05/2025 14:01:38.61] Menjalankan minuman:reset-stok 
+✅ Stok hari ini telah ditambahkan dengan stok besok, dan stok besok dikosongkan.
+[Sun 10/05/2025 14:01:38.61] ✅ Semua command selesai 
+[Wed 10/08/2025  9:23:56.48] Menjalankan laporanpenjualan:reset-harian 
+⚠️ Tidak ada laporan penjualan hari ini untuk disimpan.
+[Wed 10/08/2025  9:23:56.48] Menjalankan laporanproduksi:reset-harian 
+⚠️ Tidak ada laporan produksi hari ini untuk disimpan.
+[Wed 10/08/2025  9:23:56.48] Menjalankan minuman:reset-stok 
+✅ Stok hari ini telah ditambahkan dengan stok besok, dan stok besok dikosongkan.
+[Wed 10/08/2025  9:23:56.48] ✅ Semua command selesai 
