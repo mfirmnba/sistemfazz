@@ -7,14 +7,14 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
-                'resources/js/app.js'
+                'resources/js/app.js',
             ],
             refresh: true,
         }),
         tailwindcss(),
     ],
     build: {
-        outDir: 'public/build', // 🟢 pastikan baris ini ada
+        outDir: 'public/build',
         manifest: true,
         emptyOutDir: true,
     },
