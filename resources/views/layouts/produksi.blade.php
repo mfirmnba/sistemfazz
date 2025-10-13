@@ -8,10 +8,6 @@
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        <link
-            href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css"
-            rel="stylesheet"
-        />
         <style>
             /* ====== RESPONSIVE PRODUKSI LAYOUT ====== */
             @media (max-width: 1024px) {

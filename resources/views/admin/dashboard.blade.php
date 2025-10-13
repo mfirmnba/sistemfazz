@@ -98,8 +98,7 @@
         </div>
     </div>
 
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
         document.querySelectorAll(".delete-btn").forEach((button) => {
             button.addEventListener("click", function () {
@@ -188,8 +187,6 @@
         </div>
     </div>
 
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.querySelectorAll(".delete-btn").forEach((button) => {
             button.addEventListener("click", function () {
