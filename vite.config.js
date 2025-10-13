@@ -10,11 +10,6 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
-    build: {
-        outDir: 'public/build', // pastikan di sini ya
-        manifest: true,
-        emptyOutDir: true,
-    },
     server: {
         cors: true,
     },
