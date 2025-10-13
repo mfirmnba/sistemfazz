@@ -12,7 +12,7 @@ export default defineConfig({
         tailwindcss(),
     ],
     build: {
-        outDir: 'public/build',  // hasil build ada di public/build
+        outDir: 'build',  // hasil build ada di public/build
         emptyOutDir: true,
         rollupOptions: {
             output: {
