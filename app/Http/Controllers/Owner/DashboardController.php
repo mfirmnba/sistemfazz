@@ -212,7 +212,7 @@ class DashboardController extends Controller
 
         // Gabungkan dari tabel aktif + history
         $dataAktif = LaporanPenjualan::select(
-                'driver_id',
+                'user_id',
                 DB::raw('DATE(tanggal) as tanggal'),
                 DB::raw('SUM(total_harga) as total_pendapatan')
             )
@@ -220,11 +220,11 @@ class DashboardController extends Controller
             ->get();
 
         $dataHistory = LaporanPenjualanHistory::select(
-                'driver_id',
+                'user_id',
                 DB::raw('DATE(tanggal) as tanggal'),
                 DB::raw('SUM(total_harga) as total_pendapatan')
             )
-            ->groupBy('driver_id', 'tanggal')
+            ->groupBy('user_id', 'tanggal')
             ->get();
 
         $gabung = $dataAktif->concat($dataHistory);
