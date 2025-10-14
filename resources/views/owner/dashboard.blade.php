@@ -195,9 +195,9 @@
         </div>
     </div>
 
-    {{-- Grafik Pendapatan Harian per Driver --}}
-    <div class="h-[400px]">
-        <canvas id="chartPendapatanDriver"></canvas>
+    <div class="p-4 bg-white shadow rounded-lg mt-6">
+    <h3 class="text-lg font-semibold mb-2">Grafik Pendapatan Harian per Driver</h3>
+    <canvas id="chartPendapatanDriverHarian" height="120"></canvas>
     </div>
 
     <!-- 🥤 Minuman Terjual Hari Ini per Driver -->
@@ -351,32 +351,7 @@
                             RATA-RATA MARGIN
                         </td>
                         <td colspan="3" class="p-3 border text-left">
-                            {{ number_format($minumans->avg->margin, 2, ',', '.')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                            {{ number_format($minumans->avg->margin, 2, ',', '.') 
 
                             }}%
                         </td>
