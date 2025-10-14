@@ -912,114 +912,106 @@
                                     }
                                 });
 
-        const ctxDriver = document.getElementById('chartPendapatanDriver');
-        if (ctxDriver) {
-            const ctx = ctxDriver.getContext('2d');
-            const pendapatanData = @json($pendapatanDriverHarian);
+            // =========================
+            // 7. Line Chart: Pendapatan Driver Hari Demi Hari (Data Berkelanjutan)
+            // =========================
+            document.addEventListener("DOMContentLoaded", function() {
+                const canvas = document.getElementById('chartPendapatanDriver');
+                if (!canvas) return;
 
-            if (window.chartPendapatanDriver instanceof Chart) {
-                window.chartPendapatanDriver.destroy();
-            }
+                const ctx = canvas.getContext('2d');
+                const pendapatanData = @json($pendapatanDriverHarian);
 
-            const colorPalette = [
-                'rgba(75, 192, 192, 0.8)',
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)',
-                'rgba(255, 206, 86, 0.8)',
-                'rgba(153, 102, 255, 0.8)',
-                'rgba(255, 159, 64, 0.8)',
-                'rgba(16, 185, 129, 0.8)',
-                'rgba(99, 102, 241, 0.8)'
-            ];
+                // Hapus chart lama agar tidak dobel
+                if (window.chartPendapatanDriver instanceof Chart) {
+                    window.chartPendapatanDriver.destroy();
+                }
 
-    const ctxDriver = document.getElementById('chartPendapatanDriver');
-    if (ctxDriver) {
-        const ctx = ctxDriver.getContext('2d');
-        const pendapatanData = @json($pendapatanDriverHarian);
+                const colorPalette = [
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(99, 102, 241, 0.8)'
+                ];
 
-        if (window.chartPendapatanDriver instanceof Chart) {
-            window.chartPendapatanDriver.destroy();
-        }
+                const datasets = Object.entries(pendapatanData).map(([namaDriver, records], index) => {
+                    if (!records || records.length === 0) return null;
 
-        const colorPalette = [
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(54, 162, 235, 0.8)',
-            'rgba(255, 206, 86, 0.8)',
-            'rgba(153, 102, 255, 0.8)',
-            'rgba(255, 159, 64, 0.8)',
-            'rgba(16, 185, 129, 0.8)',
-            'rgba(99, 102, 241, 0.8)'
-        ];
+                    // Urutkan tanggal biar rapi dan terbaca adapter date-fns
+                    const sortedRecords = records.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
-        const datasets = Object.entries(pendapatanData).map(([namaDriver, records], index) => {
-            if (!records || records.length === 0) return null;
+                    return {
+                        label: namaDriver,
+                        data: sortedRecords.map(d => ({
+                            x: d.tanggal, // pakai format string 'YYYY-MM-DD' biar adapter date-fns bisa parse
+                            y: parseFloat(d.total_pendapatan)
+                        })),
+                        borderColor: colorPalette[index % colorPalette.length],
+                        backgroundColor: colorPalette[index % colorPalette.length],
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: false,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    };
+                }).filter(Boolean);
 
-            // Pastikan data diurutkan berdasarkan tanggal
-            const sortedRecords = records.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+                if (datasets.length === 0) return; // tidak ada data, jangan render chart
 
-            return {
-                label: namaDriver,
-                data: sortedRecords.map(d => ({
-                    x: new Date(d.tanggal),
-                    y: parseFloat(d.total_pendapatan)
-                })),
-                borderColor: colorPalette[index % colorPalette.length],
-                backgroundColor: colorPalette[index % colorPalette.length],
-                borderWidth: 2,
-                tension: 0.3,
-                fill: false,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            };
-        }).filter(Boolean);
-
-        window.chartPendapatanDriver = new Chart(ctx, {
-            type: 'line',
-            data: { datasets },
-            options: {
-                responsive: true,
-                parsing: false,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day',
-                            tooltipFormat: 'dd MMM yyyy',
-                            displayFormats: {
-                                day: 'dd MMM'
+                window.chartPendapatanDriver = new Chart(ctx, {
+                    type: 'line',
+                    data: { datasets },
+                    options: {
+                        responsive: true,
+                        parsing: false,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    tooltipFormat: 'dd MMM yyyy',
+                                    displayFormats: { day: 'dd MMM' }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Tanggal'
+                                },
+                                ticks: {
+                                    autoSkip: true,
+                                    maxTicksLimit: 14
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Pendapatan (Rp)'
+                                },
+                                ticks: {
+                                    callback: v => 'Rp ' + v.toLocaleString('id-ID')
+                                }
                             }
                         },
-                        title: { display: true, text: 'Tanggal' },
-                        ticks: {
-                            autoSkip: true,
-                            maxTicksLimit: 14
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        title: { display: true, text: 'Pendapatan (Rp)' },
-                        ticks: {
-                            callback: v => 'Rp ' + v.toLocaleString('id-ID')
-                        }
-                    }
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '📈 Pendapatan Driver Hari Demi Hari (Data Berkelanjutan)'
-                    },
-                    legend: { position: 'bottom' },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => `${ctx.dataset.label}: Rp ${ctx.parsed.y.toLocaleString('id-ID')}`
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: '📈 Pendapatan Driver Hari Demi Hari (Data Berkelanjutan)'
+                            },
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => `${ctx.dataset.label}: Rp ${ctx.parsed.y.toLocaleString('id-ID')}`
+                                }
+                            }
                         }
                     }
-                }
-            }
-        });
-    }
+                });
+            });
 </script>
 
 <style>
