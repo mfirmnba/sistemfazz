@@ -916,44 +916,38 @@
             // 7. Line Chart: Pendapatan Driver Hari Demi Hari (Data Berkelanjutan)
             // =========================
             document.addEventListener("DOMContentLoaded", function() {
-                const canvas = document.getElementById('chartPendapatanDriver');
-                if (!canvas) return;
+                const ctx = document.getElementById('chartPendapatanDriverHarian').getContext('2d');
+                const pendapatanData = @json($pendapatanDriverHarian);
 
-                const ctx = canvas.getContext('2d');
-                const pendapatanData = @json($pendapatanSemuaDriverHarian);
+                const warna = [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                ];
 
-                // Hapus chart lama biar gak dobel
-                if (window.chartPendapatanDriver instanceof Chart) {
-                    window.chartPendapatanDriver.destroy();
-                }
+                const datasets = Object.entries(pendapatanData).map(([driver, items], i) => {
+                    const sorted = items.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+                    return {
+                        label: driver,
+                        data: sorted.map(x => ({ x: x.tanggal, y: x.total_pendapatan })),
+                        borderColor: warna[i % warna.length],
+                        backgroundColor: warna[i % warna.length],
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 3,
+                    };
+                });
 
-                // Urutkan data berdasarkan tanggal
-                const sortedData = pendapatanData.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
-
-                // Siapkan dataset tunggal (total semua driver per hari)
-                const dataset = {
-                    label: 'Total Pendapatan Semua Driver (Harian)',
-                    data: sortedData.map(d => ({
-                        x: d.tanggal,
-                        y: parseFloat(d.total_pendapatan)
-                    })),
-                    borderColor: 'rgba(54, 162, 235, 0.9)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.3)',
-                    borderWidth: 3,
-                    tension: 0.3,
-                    fill: true,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                };
-
-                // Render chart
-                window.chartPendapatanDriver = new Chart(ctx, {
+                new Chart(ctx, {
                     type: 'line',
-                    data: { datasets: [dataset] },
+                    data: { datasets },
                     options: {
                         responsive: true,
                         parsing: false,
-                        maintainAspectRatio: false,
                         scales: {
                             x: {
                                 type: 'time',
@@ -962,21 +956,11 @@
                                     tooltipFormat: 'dd MMM yyyy',
                                     displayFormats: { day: 'dd MMM' }
                                 },
-                                title: {
-                                    display: true,
-                                    text: 'Tanggal'
-                                },
-                                ticks: {
-                                    autoSkip: true,
-                                    maxTicksLimit: 14
-                                }
+                                title: { display: true, text: 'Tanggal' }
                             },
                             y: {
                                 beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Pendapatan (Rp)'
-                                },
+                                title: { display: true, text: 'Pendapatan (Rp)' },
                                 ticks: {
                                     callback: v => 'Rp ' + v.toLocaleString('id-ID')
                                 }
@@ -985,12 +969,12 @@
                         plugins: {
                             title: {
                                 display: true,
-                                text: '📊 Pendapatan Semua Driver Hari Demi Hari (All Time)'
+                                text: '📈 Grafik Pendapatan Harian per Driver'
                             },
                             legend: { position: 'bottom' },
                             tooltip: {
                                 callbacks: {
-                                    label: ctx => `Rp ${ctx.parsed.y.toLocaleString('id-ID')}`
+                                    label: ctx => `${ctx.dataset.label}: Rp ${ctx.parsed.y.toLocaleString('id-ID')}`
                                 }
                             }
                         }
