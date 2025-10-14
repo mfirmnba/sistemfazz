@@ -205,39 +205,43 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('tanggal');
 
-        // ======================
-        // Pendapatan harian per driver
-        // ======================
-        $pendapatanDriverHarian = [];
+            // ======================
+            // Pendapatan harian per driver
+            // ======================
+            $pendapatanDriverHarian = [];
 
-        // Gabungkan dari tabel aktif + history
-        $dataAktif = LaporanPenjualan::select(
-                'user_id',
-                DB::raw('DATE(tanggal) as tanggal'),
-                DB::raw('SUM(total_harga) as total_pendapatan')
-            )
-            ->groupBy('user_id', 'tanggal')
-            ->get();
+            // Gabungkan dari tabel aktif + history
+            $dataAktif = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+                ->select(
+                    'laporan_penjualans.user_id',
+                    DB::raw('DATE(laporan_penjualans.tanggal) as tanggal'),
+                    DB::raw('SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
+                )
+                ->groupBy('laporan_penjualans.user_id', 'tanggal')
+                ->get();
 
-        $dataHistory = LaporanPenjualanHistory::select(
-                'user_id',
-                DB::raw('DATE(tanggal) as tanggal'),
-                DB::raw('SUM(total_harga) as total_pendapatan')
-            )
-            ->groupBy('user_id', 'tanggal')
-            ->get();
+            $dataHistory = LaporanPenjualanHistory::join('minumans', 'laporan_penjualan_histories.minuman_id', '=', 'minumans.id')
+                ->select(
+                    'laporan_penjualan_histories.user_id',
+                    DB::raw('DATE(laporan_penjualan_histories.tanggal) as tanggal'),
+                    DB::raw('SUM(laporan_penjualan_histories.jumlah * minumans.harga) as total_pendapatan')
+                )
+                ->groupBy('laporan_penjualan_histories.user_id', 'tanggal')
+                ->get();
 
-        $gabung = $dataAktif->concat($dataHistory);
+            $gabung = $dataAktif->concat($dataHistory);
 
-        // Kelompokkan per driver
-        foreach ($gabung as $row) {
-            if (!$row->driver) continue;
-            $nama = $row->driver->nama ?? 'Tanpa Nama';
-            $pendapatanDriverHarian[$nama][] = [
-                'tanggal' => $row->tanggal,
-                'total_pendapatan' => (float) $row->total_pendapatan,
-            ];
-        }
+            // Kelompokkan per driver
+            foreach ($gabung as $row) {
+                $driver = User::find($row->user_id);
+                if (!$driver) continue;
+
+                $nama = $driver->name ?? 'Tanpa Nama';
+                $pendapatanDriverHarian[$nama][] = [
+                    'tanggal' => $row->tanggal,
+                    'total_pendapatan' => (float) $row->total_pendapatan,
+                ];
+            }
 
         return view('owner.dashboard', compact(
             'minumans',
