@@ -920,51 +920,36 @@
                 if (!canvas) return;
 
                 const ctx = canvas.getContext('2d');
-                const pendapatanData = @json($pendapatanDriverHarian);
+                const pendapatanData = @json($pendapatanSemuaDriverHarian);
 
-                // Hapus chart lama agar tidak dobel
+                // Hapus chart lama biar gak dobel
                 if (window.chartPendapatanDriver instanceof Chart) {
                     window.chartPendapatanDriver.destroy();
                 }
 
-                const colorPalette = [
-                    'rgba(75, 192, 192, 0.8)',
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 206, 86, 0.8)',
-                    'rgba(153, 102, 255, 0.8)',
-                    'rgba(255, 159, 64, 0.8)',
-                    'rgba(16, 185, 129, 0.8)',
-                    'rgba(99, 102, 241, 0.8)'
-                ];
+                // Urutkan data berdasarkan tanggal
+                const sortedData = pendapatanData.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
-                const datasets = Object.entries(pendapatanData).map(([namaDriver, records], index) => {
-                    if (!records || records.length === 0) return null;
+                // Siapkan dataset tunggal (total semua driver per hari)
+                const dataset = {
+                    label: 'Total Pendapatan Semua Driver (Harian)',
+                    data: sortedData.map(d => ({
+                        x: d.tanggal,
+                        y: parseFloat(d.total_pendapatan)
+                    })),
+                    borderColor: 'rgba(54, 162, 235, 0.9)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.3)',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                };
 
-                    // Urutkan tanggal biar rapi dan terbaca adapter date-fns
-                    const sortedRecords = records.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
-
-                    return {
-                        label: namaDriver,
-                        data: sortedRecords.map(d => ({
-                            x: d.tanggal, // pakai format string 'YYYY-MM-DD' biar adapter date-fns bisa parse
-                            y: parseFloat(d.total_pendapatan)
-                        })),
-                        borderColor: colorPalette[index % colorPalette.length],
-                        backgroundColor: colorPalette[index % colorPalette.length],
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: false,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    };
-                }).filter(Boolean);
-
-                if (datasets.length === 0) return; // tidak ada data, jangan render chart
-
+                // Render chart
                 window.chartPendapatanDriver = new Chart(ctx, {
                     type: 'line',
-                    data: { datasets },
+                    data: { datasets: [dataset] },
                     options: {
                         responsive: true,
                         parsing: false,
@@ -1000,12 +985,12 @@
                         plugins: {
                             title: {
                                 display: true,
-                                text: '📈 Pendapatan Driver Hari Demi Hari (Data Berkelanjutan)'
+                                text: '📊 Pendapatan Semua Driver Hari Demi Hari (All Time)'
                             },
                             legend: { position: 'bottom' },
                             tooltip: {
                                 callbacks: {
-                                    label: ctx => `${ctx.dataset.label}: Rp ${ctx.parsed.y.toLocaleString('id-ID')}`
+                                    label: ctx => `Rp ${ctx.parsed.y.toLocaleString('id-ID')}`
                                 }
                             }
                         }
