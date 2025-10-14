@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Owner;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Minuman;
 use App\Models\LaporanProduksiHistory;
