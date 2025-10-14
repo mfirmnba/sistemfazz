@@ -913,6 +913,26 @@
                                 });
 
         const ctxDriver = document.getElementById('chartPendapatanDriver');
+        if (ctxDriver) {
+            const ctx = ctxDriver.getContext('2d');
+            const pendapatanData = @json($pendapatanDriverHarian);
+
+            if (window.chartPendapatanDriver instanceof Chart) {
+                window.chartPendapatanDriver.destroy();
+            }
+
+            const colorPalette = [
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(153, 102, 255, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(99, 102, 241, 0.8)'
+            ];
+
+    const ctxDriver = document.getElementById('chartPendapatanDriver');
     if (ctxDriver) {
         const ctx = ctxDriver.getContext('2d');
         const pendapatanData = @json($pendapatanDriverHarian);
@@ -935,9 +955,12 @@
         const datasets = Object.entries(pendapatanData).map(([namaDriver, records], index) => {
             if (!records || records.length === 0) return null;
 
+            // Pastikan data diurutkan berdasarkan tanggal
+            const sortedRecords = records.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+
             return {
                 label: namaDriver,
-                data: records.map(d => ({
+                data: sortedRecords.map(d => ({
                     x: new Date(d.tanggal),
                     y: parseFloat(d.total_pendapatan)
                 })),
@@ -961,20 +984,31 @@
                 scales: {
                     x: {
                         type: 'time',
-                        time: { unit: 'day', tooltipFormat: 'dd MMM yyyy' },
+                        time: {
+                            unit: 'day',
+                            tooltipFormat: 'dd MMM yyyy',
+                            displayFormats: {
+                                day: 'dd MMM'
+                            }
+                        },
                         title: { display: true, text: 'Tanggal' },
-                        ticks: { autoSkip: true, maxTicksLimit: 10 }
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 14
+                        }
                     },
                     y: {
                         beginAtZero: true,
                         title: { display: true, text: 'Pendapatan (Rp)' },
-                        ticks: { callback: v => 'Rp ' + v.toLocaleString('id-ID') }
+                        ticks: {
+                            callback: v => 'Rp ' + v.toLocaleString('id-ID')
+                        }
                     }
                 },
                 plugins: {
                     title: {
                         display: true,
-                        text: '📈 Pendapatan Driver Hari Demi Hari'
+                        text: '📈 Pendapatan Driver Hari Demi Hari (Data Berkelanjutan)'
                     },
                     legend: { position: 'bottom' },
                     tooltip: {

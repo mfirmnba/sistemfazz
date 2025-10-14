@@ -209,13 +209,28 @@ class DashboardController extends Controller
         // =============================================================
 
         // Ambil semua driver aktif
-        $drivers = \App\Models\User::where('role', 'driver')->get();
+        $drivers = User::where('role', 'driver')->get();
 
-        // Ambil semua tanggal dalam 7 hari terakhir (bisa kamu ubah)
-        $periode = CarbonPeriod::create(now()->subDays(6)->toDateString(), now()->toDateString());
+        // 🔹 Ambil tanggal paling awal & paling akhir dari semua data (aktif + history)
+        $tanggalAwal = LaporanPenjualan::min('tanggal');
+        $tanggalAwalHistory = LaporanPenjualanHistory::min('tanggal');
+        $tanggalAwalFinal = min(array_filter([$tanggalAwal, $tanggalAwalHistory]));
 
-        // Ambil data pendapatan dari tabel aktif
-        $laporanAktif = \App\Models\LaporanPenjualan::with('user', 'minuman')
+        $tanggalAkhir = LaporanPenjualan::max('tanggal');
+        $tanggalAkhirHistory = LaporanPenjualanHistory::max('tanggal');
+        $tanggalAkhirFinal = max(array_filter([$tanggalAkhir, $tanggalAkhirHistory]));
+
+        // 🔹 Jika belum ada data sama sekali, fallback ke hari ini
+        if (!$tanggalAwalFinal || !$tanggalAkhirFinal) {
+            $tanggalAwalFinal = now()->toDateString();
+            $tanggalAkhirFinal = now()->toDateString();
+        }
+
+        // 🔹 Buat periode berdasarkan data nyata di database
+        $periode = CarbonPeriod::create($tanggalAwalFinal, $tanggalAkhirFinal);
+
+        // Ambil data dari tabel aktif
+        $laporanAktif = LaporanPenjualan::with('user', 'minuman')
             ->join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
             ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
             ->where('laporan_penjualans.status', 'terjual')
@@ -223,6 +238,7 @@ class DashboardController extends Controller
             ->selectRaw('DATE(laporan_penjualans.tanggal) as tanggal, users.id as user_id, users.name as nama_driver, SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
             ->groupBy('tanggal', 'users.id', 'users.name');
 
+        // Ambil data dari tabel history
         $laporanHistory = LaporanPenjualanHistory::with('user', 'minuman')
             ->join('minumans', 'laporan_penjualan_histories.minuman_id', '=', 'minumans.id')
             ->join('users', 'laporan_penjualan_histories.user_id', '=', 'users.id')
@@ -231,10 +247,11 @@ class DashboardController extends Controller
             ->selectRaw('DATE(laporan_penjualan_histories.tanggal) as tanggal, users.id as user_id, users.name as nama_driver, SUM(laporan_penjualan_histories.jumlah * minumans.harga) as total_pendapatan')
             ->groupBy('tanggal', 'users.id', 'users.name');
 
+        // Gabungkan data aktif & history
         $laporanPendapatan = $laporanHistory
             ->unionAll($laporanAktif)
             ->get()
-            ->groupBy(fn($item) => $item->user_id . '_' . $item->tanggal) // ✅ FIX: ubah dari ['user_id', 'tanggal']
+            ->groupBy(fn($item) => $item->user_id . '_' . $item->tanggal)
             ->map(function ($items) {
                 $first = $items->first();
                 return (object)[
@@ -264,6 +281,7 @@ class DashboardController extends Controller
                 ];
             }
         }
+
         return view('owner.dashboard', compact(
             'minumans',
             'stocks',
