@@ -216,7 +216,7 @@ class DashboardController extends Controller
                 DB::raw('DATE(tanggal) as tanggal'),
                 DB::raw('SUM(total_harga) as total_pendapatan')
             )
-            ->groupBy('driver_id', 'tanggal')
+            ->groupBy('user_id', 'tanggal')
             ->get();
 
         $dataHistory = LaporanPenjualanHistory::select(
