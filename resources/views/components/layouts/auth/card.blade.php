@@ -8,7 +8,11 @@
             <div class="flex w-full max-w-md flex-col gap-6">
                 <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium" wire:navigate>
                     <span class="flex h-9 w-9 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
+                        <img
+                            src="{{ asset('images/logo.jpg') }}"
+                            alt="Logo"
+                            class="w-9 h-9 rounded-md object-cover shadow"
+                        />
                     </span>
 
                     <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
