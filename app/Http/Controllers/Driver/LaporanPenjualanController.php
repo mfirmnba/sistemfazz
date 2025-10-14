@@ -168,7 +168,7 @@ class LaporanPenjualanController extends Controller
         $message .= "  Total Minuman Keluar: {$totalKeluar} cup\n";
         $message .= "  Pendapatan (hanya terjual): Rp " . number_format($pendapatan,0,',','.') . "\n";
 
-        $phone = '62895630447306'; // ganti sesuai tujuan
+        $phone = '6289504528079'; // ganti sesuai tujuan
         $url = 'https://wa.me/' . $phone . '?text=' . urlencode($message);
 
         return redirect($url);

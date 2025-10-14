@@ -52,7 +52,7 @@ class DashboardController extends Controller
         }
 
         // Nomor WA tujuan (contoh +6281234567890)
-        $phoneNumber = '62895630447306';
+        $phoneNumber = '6289504528079';
 
         // Encode URL
         $url = 'https://wa.me/' . $phoneNumber . '?text=' . urlencode($message);

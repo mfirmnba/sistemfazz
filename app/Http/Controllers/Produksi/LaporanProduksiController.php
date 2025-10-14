@@ -141,7 +141,7 @@ class LaporanProduksiController extends Controller
             $message .= "- {$namaBahan}: {$item->jumlah_digunakan} {$satuan}\n";
         }
 
-        $phone = '62895630447306'; // nomor tujuan WA
+        $phone = '6289504528079'; // nomor tujuan WA
         $waLink = "https://api.whatsapp.com/send?phone={$phone}&text=" . urlencode($message);
 
         return redirect($waLink);
