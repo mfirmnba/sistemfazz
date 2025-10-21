@@ -619,13 +619,16 @@
         </div>
     </div>
 {{-- ============================= --}}
-{{-- Grafik Gabungan: Pendapatan & Cup Terjual per Driver --}}
+{{-- Grafik Gabungan: Penjualan & Pendapatan per Driver --}}
 {{-- ============================= --}}
 <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow p-4">
     <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-4">
         Grafik Penjualan & Pendapatan per Driver
     </h2>
-    <canvas id="chartGabungDriverLine" height="130"></canvas>
+    {{-- ✅ Bungkus canvas dalam div tinggi tetap --}}
+    <div style="height: 300px; width: 100%;">
+        <canvas id="chartGabungDriverLine"></canvas>
+    </div>
 </div>
 
 <!-- Chart.js -->
