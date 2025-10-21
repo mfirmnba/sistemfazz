@@ -236,7 +236,7 @@
     </div>
 
     <!-- 🥤 Minuman Terjual Hari Ini per Driver -->
-    <div class="bg-white p-6 rounded-xl shadow mt-10">
+    <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
         <h2 class="text-xl font-semibold mb-4">
             🥤 Minuman Terjual Hari Ini per Driver
         </h2>
@@ -298,7 +298,7 @@
     </div>
 
     <!-- Rincian Pendapatan Per User Hari Ini -->
-    <div class="bg-white p-6 rounded-xl shadow mb-10">
+    <div class="bg-white p-6 rounded-xl shadow mb-10 mt-6">
         <h2 class="text-lg font-semibold mb-4">
             📅 Pendapatan Rider (Hari Ini)
         </h2>
@@ -393,6 +393,12 @@
         @endif
     </div>
 
+    <!-- Grafik Stok Terpakai -->
+    <div class="bg-white p-4 shadow rounded-lg mb-8 mt-6">
+        <h2 class="text-xl font-semibold mb-2">📊 Grafik Stock</h2>
+        <canvas id="stokTerpakaiChart" class="w-full h-64"></canvas>
+    </div>
+
     <!-- Rincian Stock -->
     <div class="bg-white p-6 rounded-xl shadow mb-10">
         <h2 class="text-lg font-semibold mb-4">📦 Rincian Total Stock</h2>
@@ -426,12 +432,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
-
-    <!-- Grafik Stok Terpakai -->
-    <div class="bg-white p-4 shadow rounded-lg mb-8 mt-6">
-        <h2 class="text-xl font-semibold mb-2">📊 Grafik Stock</h2>
-        <canvas id="stokTerpakaiChart" class="w-full h-64"></canvas>
     </div>
 
     <!-- Rincian Produksi Hari Ini -->
@@ -623,342 +623,249 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script>
-                                // =========================
-                                // 1. Bar Chart: Bahan Terpakai Hari Ini
-                                // =========================
-                                new Chart(document.getElementById("barChart"), {
-                                    type: "bar",
-                                    data: {
-                                        labels: @json($laporanToday->pluck('stock.nama_bahan')),
-                                        datasets: [{
-                                            label: "Jumlah Stok Dipakai Hari ini",
-                                            data: @json($laporanToday->pluck('jumlah_digunakan')),
-                                            backgroundColor: "#10b981",
-                                            borderRadius: 5
-                                        }],
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        plugins: { legend: { display: true } },
-                                        scales: { y: { beginAtZero: true } },
-                                    },
-                                });
+document.addEventListener("DOMContentLoaded", function() {
+    // Global penyimpanan chart aktif
+    if (window.chartInstances === undefined) window.chartInstances = {};
 
-                                // =========================
-                                // 2. Doughnut Chart: Stok tersedia vs terpakai
-                                // =========================
-                                new Chart(document.getElementById("doughnutChart"), {
-                                    type: "doughnut",
-                                    data: {
-                                        labels: ["Tersedia", "Terpakai"],
-                                        datasets: [{
-                                            data: [{{ $totalStock }}, {{ $bahanTerpakaiHariIni }}],
-                                            backgroundColor: ["#3b82f6", "#ef4444"],
-                                            borderWidth: 2,
-                                            borderColor: "#fff"
-                                        }],
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        plugins: { legend: { position: "bottom" } }
-                                    }
-                                });
+    // Fungsi bantu untuk membuat chart tanpa duplikat
+    function createChart(id, config) {
+        if (window.chartInstances[id]) window.chartInstances[id].destroy();
+        window.chartInstances[id] = new Chart(document.getElementById(id), config);
+    }
 
-                                // =========================
-                                // 3. Line Chart: Penjualan Minuman Hari Ini
-                                // =========================
-                                new Chart(document.getElementById("lineChart"), {
-                                    type: "line",
-                                    data: {
-                                        labels: @json($laporanPenjualanGrouped->keys()),
-                                        datasets: [{
-                                            label: "Jumlah Minuman Terjual Hari Ini",
-                                            data: @json($laporanPenjualanGrouped->values()),
-                                            borderColor: "red",
-                                            backgroundColor: "rgba(255, 99, 132, 0.2)",
-                                            fill: true,
-                                            tension: 0.3,
-                                        }],
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        plugins: { legend: { display: true } },
-                                        scales: { y: { beginAtZero: true } },
-                                    },
-                                });
+    // =========================
+    // 1. Bar Chart: Bahan Terpakai Hari Ini
+    // =========================
+    createChart("barChart", {
+        type: "bar",
+        data: {
+            labels: @json($laporanToday->pluck('stock.nama_bahan')),
+            datasets: [{
+                label: "Jumlah Stok Dipakai Hari ini",
+                data: @json($laporanToday->pluck('jumlah_digunakan')),
+                backgroundColor: "#10b981",
+                borderRadius: 5
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: true } },
+            scales: { y: { beginAtZero: true } },
+        },
+    });
 
-                                // =========================
-                                // 4. Bar Chart: Stok vs Terpakai Hari Ini
-                                // =========================
-                                const ctxStok = document.getElementById('stokTerpakaiChart').getContext('2d');
-                                const labelsStok = @json($stocks->pluck('nama_bahan'));
-                                const jumlahBahan = @json($stocks->pluck('jumlah'));
+    // =========================
+    // 2. Doughnut Chart: Perbandingan Bahan Terpakai
+    // =========================
+    createChart("doughnutChart", {
+        type: "doughnut",
+        data: {
+            labels: @json($laporanToday->pluck('stock.nama_bahan')),
+            datasets: [{
+                data: @json($laporanToday->pluck('jumlah_digunakan')),
+                backgroundColor: [
+                    "#3b82f6",
+                    "#f59e0b",
+                    "#ef4444",
+                    "#10b981",
+                    "#8b5cf6",
+                    "#ec4899",
+                ],
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: "bottom" },
+                title: {
+                    display: true,
+                    text: "Persentase Bahan Dipakai Hari Ini",
+                },
+            },
+        },
+    });
 
-                                const terpakaiMap = {};
-                                @foreach($laporanToday as $item)
-                                    @if($item->stock)
-                                        terpakaiMap["{{ $item->stock->nama_bahan }}"] = {{ $item->jumlah_digunakan }};
-                                    @endif
-                                @endforeach
-                                const stokTerpakai = labelsStok.map(nama => terpakaiMap[nama] ?? 0);
+    // =========================
+    // 3. Line Chart: Stok Bahan (mingguan)
+    // =========================
+    createChart("lineChart", {
+        type: "line",
+        data: {
+            labels: @json($stokMingguan->pluck('tanggal')),
+            datasets: [{
+                label: "Total Stok Bahan",
+                data: @json($stokMingguan->pluck('total_stok')),
+                fill: false,
+                borderColor: "#3b82f6",
+                tension: 0.3,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: true } },
+            scales: { y: { beginAtZero: true } },
+        },
+    });
 
-                                const bgColors = jumlahBahan.map(stok => stok < 500 ? 'rgba(220,38,38,0.7)' : 'rgba(59,130,246,0.7)');
-
-                                new Chart(ctxStok, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: labelsStok,
-                                        datasets: [
-                                            {
-                                                label: 'Jumlah Stok',
-                                                data: jumlahBahan,
-                                                backgroundColor: bgColors,
-                                                borderRadius: 5
-                                            },
-                                            {
-                                                label: 'Stok Terpakai Hari Ini',
-                                                data: stokTerpakai,
-                                                backgroundColor: 'rgba(16,185,129,0.7)',
-                                                borderRadius: 5
-                                            }
-                                        ]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        plugins: {
-                                            legend: { position: 'bottom' },
-                                            tooltip: { mode: 'index', intersect: false }
-                                        },
-                                        scales: {
-                                            x: { stacked: false, title: { display: true, text: 'Nama Bahan' } },
-                                            y: { beginAtZero: true, title: { display: true, text: 'Jumlah' } }
-                                        }
-                                    }
-                                });
-
-                                // =========================
-                                // 5. Bar Chart: Keuntungan per Minuman (urut terbanyak)
-                                // =========================
-                                const ctxKeuntungan = document.getElementById("keuntunganChart").getContext("2d");
-                                const labelsKeuntungan = @json($minumans->pluck('nama'));
-                                const hargas = @json($minumans->pluck('harga'));
-                                const hpps = @json($minumans->pluck('hpp'));
-                                const keuntunganData = hargas.map((harga, i) => harga - (hpps[i] ?? 0));
-
-                                const dataGabung = labelsKeuntungan.map((nama, i) => ({
-                                    nama,
-                                    keuntungan: keuntunganData[i]
-                                })).sort((a, b) => b.keuntungan - a.keuntungan);
-
-                                const sortedLabels = dataGabung.map(d => d.nama);
-                                const sortedData = dataGabung.map(d => d.keuntungan);
-
-                                new Chart(ctxKeuntungan, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: sortedLabels,
-                                        datasets: [{
-                                            label: 'Keuntungan per Cup (Rp)',
-                                            data: sortedData,
-                                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                                            borderRadius: 6,
-                                            barThickness: 18,
-                                            maxBarThickness: 20,
-                                            borderSkipped: false
-                                        }]
-                                    },
-                                    options: {
-                                        indexAxis: 'y',
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            legend: { display: false },
-                                            tooltip: {
-                                                callbacks: {
-                                                    label: ctx => 'Rp ' + ctx.parsed.x.toLocaleString('id-ID')
-                                                }
-                                            }
-                                        },
-                                        scales: {
-                                            x: {
-                                                beginAtZero: true,
-                                                ticks: {
-                                                    callback: value => 'Rp ' + value.toLocaleString('id-ID'),
-                                                    font: { size: 11 }
-                                                },
-                                                grid: { color: '#f1f5f9' }
-                                            },
-                                            y: {
-                                                ticks: { font: { size: 12 } },
-                                                grid: { display: false }
-                                            }
-                                        }
-                                    }
-                                });
-
-                                // =========================
-                                // 6. Line Chart: Total Keuntungan Per Bulan
-                                // =========================
-                                const ctxPenjualanProfit = document.getElementById("penjualanProfitChart").getContext("2d");
-
-                                const bulanLabels = @json($bulanLabels);
-                                const penjualanData = @json($penjualanData);
-                                const profitData = @json($totalKeuntunganBulanan);
-
-                                new Chart(ctxPenjualanProfit, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: bulanLabels,
-                                        datasets: [
-                                            {
-                                                label: 'Penjualan (Rp)',
-                                                data: penjualanData,
-                                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                                                borderRadius: 6
-                                            },
-                                            {
-                                                label: 'Keuntungan (Rp)',
-                                                data: profitData,
-                                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                                                borderRadius: 6
-                                            }
-                                        ]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            tooltip: {
-                                                callbacks: {
-                                                    label: ctx => 'Rp ' + ctx.parsed.y.toLocaleString('id-ID')
-                                                }
-                                            }
-                                        },
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true,
-                                                ticks: {
-                                                    callback: value => 'Rp ' + value.toLocaleString('id-ID')
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-
-                                const ctxMinuman = document.getElementById('penjualanMinumanChart').getContext('2d');
-
-                                new Chart(ctxMinuman, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: @json($penjualanMinuman->pluck('minuman.nama')),
-                                        datasets: [{
-                                            label: 'Jumlah Terjual (Cup)',
-                                            data: @json($penjualanMinuman->pluck('total_qty')),
-                                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                                            borderColor: 'rgba(54, 162, 235, 1)',
-                                            borderWidth: 2,
-                                            borderRadius: 6,
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        plugins: {
-                                            legend: { display: false },
-                                            tooltip: {
-                                                callbacks: {
-                                                    label: function(context) {
-                                                        return context.raw + " Cup";
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        scales: {
-                                            x: {
-                                                ticks: { font: { weight: 'bold' } }
-                                            },
-                                            y: {
-                                                beginAtZero: true,
-                                                ticks: {
-                                                    stepSize: 1,
-                                                    callback: function(value) {
-                                                        return value + " Cup";
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-
-            // =========================
-            // 7. Line Chart: Pendapatan Driver Hari Demi Hari (Data Berkelanjutan)
-            // =========================
-            document.addEventListener("DOMContentLoaded", function() {
-                const ctx = document.getElementById('chartPendapatanDriverHarian').getContext('2d');
-                const pendapatanData = @json($pendapatanDriverHarian);
-
-                const warna = [
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(75, 192, 192, 0.8)',
-                    'rgba(255, 206, 86, 0.8)',
-                    'rgba(153, 102, 255, 0.8)',
-                    'rgba(255, 159, 64, 0.8)',
-                ];
-
-                const datasets = Object.entries(pendapatanData).map(([driver, items], i) => {
-                    const sorted = items.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
-                    return {
-                        label: driver,
-                        data: sorted.map(x => ({ x: x.tanggal, y: x.total_pendapatan })),
-                        borderColor: warna[i % warna.length],
-                        backgroundColor: warna[i % warna.length],
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.3,
-                        pointRadius: 3,
-                    };
-                });
-
-                new Chart(ctx, {
-                    type: 'line',
-                    data: { datasets },
-                    options: {
-                        responsive: true,
-                        parsing: false,
-                        scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    unit: 'day',
-                                    tooltipFormat: 'dd MMM yyyy',
-                                    displayFormats: { day: 'dd MMM' }
-                                },
-                                title: { display: true, text: 'Tanggal' }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                title: { display: true, text: 'Pendapatan (Rp)' },
-                                ticks: {
-                                    callback: v => 'Rp ' + v.toLocaleString('id-ID')
-                                }
-                            }
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: '📈 Grafik Pendapatan Harian per Driver'
-                            },
-                            legend: { position: 'bottom' },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => `${ctx.dataset.label}: Rp ${ctx.parsed.y.toLocaleString('id-ID')}`
-                                }
-                            }
-                        }
+    // =========================
+    // 4. Bar Chart: Penjualan Harian
+    // =========================
+    createChart("chartPenjualanHarian", {
+        type: "bar",
+        data: {
+            labels: @json($penjualanHarian->pluck('tanggal')),
+            datasets: [{
+                label: "Total Penjualan (Rp)",
+                data: @json($penjualanHarian->pluck('total_penjualan')),
+                backgroundColor: "#3b82f6",
+                borderRadius: 5,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: "📊 Penjualan Harian" },
+                legend: { display: false },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: value => 'Rp ' + value.toLocaleString('id-ID')
                     }
-                });
-            });
-</script>
+                },
+            },
+        },
+    });
 
+    // =========================
+    // 5. Doughnut Chart: Produk Terlaris
+    // =========================
+    createChart("chartProdukTerlaris", {
+        type: "doughnut",
+        data: {
+            labels: @json($produkTerlaris->pluck('nama_produk')),
+            datasets: [{
+                data: @json($produkTerlaris->pluck('jumlah_terjual')),
+                backgroundColor: [
+                    "#3b82f6",
+                    "#f59e0b",
+                    "#10b981",
+                    "#ef4444",
+                    "#8b5cf6",
+                ],
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: "🔥 Produk Terlaris Minggu Ini" },
+                legend: { position: "bottom" },
+            },
+        },
+    });
+
+    // =========================
+    // 6. Line Chart: Pendapatan Mingguan
+    // =========================
+    createChart("chartPendapatanMingguan", {
+        type: "line",
+        data: {
+            labels: @json($pendapatanMingguan->pluck('tanggal')),
+            datasets: [{
+                label: "Total Pendapatan (Rp)",
+                data: @json($pendapatanMingguan->pluck('total_pendapatan')),
+                borderColor: "#10b981",
+                backgroundColor: "#10b981",
+                fill: false,
+                tension: 0.3,
+                pointRadius: 3,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: "💰 Pendapatan Mingguan" },
+                legend: { display: false },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: value => 'Rp ' + value.toLocaleString('id-ID')
+                    }
+                },
+            },
+        },
+    });
+
+    // =========================
+    // 7. Line Chart: Pendapatan Harian per Driver
+    // =========================
+    const pendapatanData = @json($pendapatanDriverHarian);
+    const warna = [
+        'rgba(54, 162, 235, 0.8)',
+        'rgba(255, 99, 132, 0.8)',
+        'rgba(75, 192, 192, 0.8)',
+        'rgba(255, 206, 86, 0.8)',
+        'rgba(153, 102, 255, 0.8)',
+        'rgba(255, 159, 64, 0.8)',
+    ];
+
+    const datasets = Object.entries(pendapatanData).map(([driver, items], i) => {
+        const sorted = items.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+        return {
+            label: driver,
+            data: sorted.map(x => ({ x: x.tanggal, y: x.total_pendapatan })),
+            borderColor: warna[i % warna.length],
+            backgroundColor: warna[i % warna.length],
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: 3,
+        };
+    });
+
+    createChart("chartPendapatanDriverHarian", {
+        type: "line",
+        data: { datasets },
+        options: {
+            responsive: true,
+            parsing: false,
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        tooltipFormat: 'dd MMM yyyy',
+                        displayFormats: { day: 'dd MMM' }
+                    },
+                    title: { display: true, text: 'Tanggal' }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Pendapatan (Rp)' },
+                    ticks: {
+                        callback: v => 'Rp ' + v.toLocaleString('id-ID')
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: '📈 Grafik Pendapatan Harian per Driver'
+                },
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.dataset.label}: Rp ${ctx.parsed.y.toLocaleString('id-ID')}`
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
 <style>
     /* ======== RESPONSIVE FIXES FOR MOBILE ======== */
 
