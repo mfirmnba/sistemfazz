@@ -662,7 +662,7 @@
     </div>
 
 </div>
-
+@section('scripts')
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -810,6 +810,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
+@endsection
 <style>
     /* ======== RESPONSIVE FIXES FOR MOBILE ======== */
 

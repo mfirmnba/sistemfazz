@@ -107,6 +107,7 @@
             }
         }
     </style>
+    @yield('scripts')
 
     <body class="bg-gray-100 font-sans" x-data="{ sidebarOpen: false }">
         <div class="flex min-h-screen">
