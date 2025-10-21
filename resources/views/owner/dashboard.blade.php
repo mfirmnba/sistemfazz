@@ -978,65 +978,83 @@
             });
 
             document.addEventListener("DOMContentLoaded", function () {
-            // Ambil data dari Laravel
             const dataDriver = @json($penjualanPerUserAllTime);
 
-            // Pisahkan label dan data
             const labels = dataDriver.map(d => d.user?.name ?? 'Tanpa Nama');
             const cupData = dataDriver.map(d => d.total_cup);
             const pendapatanData = dataDriver.map(d => d.pendapatan);
 
-            // ===== Grafik Jumlah Cup per Driver =====
+            // ===== LINE CHART: Jumlah Cup Terjual per Driver =====
             const ctxCup = document.getElementById('chartCupDriver');
             if (ctxCup) {
                 new Chart(ctxCup, {
-                    type: 'bar',
+                    type: 'line',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Cup Terjual',
+                            label: 'Jumlah Cup Terjual',
                             data: cupData,
-                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1,
-                            borderRadius: 6
+                            fill: true,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 0, 0, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                            pointRadius: 5,
+                            tension: 0.3 // lengkung halus seperti contoh
                         }]
                     },
                     options: {
                         responsive: true,
-                        plugins: { legend: { display: false } },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: { color: '#000', boxWidth: 30, padding: 20 }
+                            }
+                        },
                         scales: {
-                            x: { ticks: { font: { weight: 'bold' } } },
+                            x: {
+                                ticks: { color: '#000', font: { weight: 'bold' } },
+                                grid: { display: false }
+                            },
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    stepSize: 1,
-                                    callback: v => v + " Cup"
-                                }
+                                    color: '#000',
+                                    callback: v => v + ' Cup'
+                                },
+                                grid: { color: '#f1f1f1' }
                             }
                         }
                     }
                 });
             }
 
-            // ===== Grafik Total Pendapatan per Driver =====
+            // ===== LINE CHART: Total Pendapatan per Driver =====
             const ctxPendapatan = document.getElementById('chartPendapatanDriver');
             if (ctxPendapatan) {
                 new Chart(ctxPendapatan, {
-                    type: 'bar',
+                    type: 'line',
                     data: {
                         labels: labels,
                         datasets: [{
                             label: 'Total Pendapatan (Rp)',
                             data: pendapatanData,
-                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                            borderRadius: 6
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                            pointRadius: 5,
+                            tension: 0.3
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: {
-                            legend: { display: false },
+                            legend: {
+                                display: true,
+                                labels: { color: '#000', boxWidth: 30, padding: 20 }
+                            },
                             tooltip: {
                                 callbacks: {
                                     label: ctx => 'Rp ' + ctx.parsed.y.toLocaleString('id-ID')
@@ -1044,11 +1062,17 @@
                             }
                         },
                         scales: {
+                            x: {
+                                ticks: { color: '#000', font: { weight: 'bold' } },
+                                grid: { display: false }
+                            },
                             y: {
                                 beginAtZero: true,
                                 ticks: {
+                                    color: '#000',
                                     callback: v => 'Rp ' + v.toLocaleString('id-ID')
-                                }
+                                },
+                                grid: { color: '#f1f1f1' }
                             }
                         }
                     }
