@@ -675,7 +675,6 @@
         <table class="min-w-full text-sm text-left border-collapse">
             <thead class="border-b border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300">
                 <tr>
-                    <th class="py-2 px-3">Tanggal</th>
                     <th class="py-2 px-3">Nama Minuman</th>
                     <th class="py-2 px-3 text-right">Jumlah Terjual</th>
                 </tr>
@@ -683,7 +682,6 @@
             <tbody>
                 @forelse($minumanTerjualPerHari as $item)
                     <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                        <td class="py-2 px-3">{{ $item->tanggal }}</td>
                         <td class="py-2 px-3">{{ $item->nama_minuman ?? '-' }}</td>
                         <td class="py-2 px-3 text-right">{{ $item->total_terjual }}</td>
                     </tr>
