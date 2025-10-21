@@ -619,204 +619,102 @@
         </div>
     </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-    <!-- Grafik Cup Terjual per Driver -->
-    <div class="bg-white shadow rounded-xl p-4">
-        <h3 class="text-lg font-semibold mb-3">Jumlah Cup Terjual per Driver</h3>
-        <canvas id="chartCupPerDriver"></canvas>
+<div class="container mx-auto p-6 space-y-8">
+
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">
+        Dashboard Driver - Statistik Penjualan & Pendapatan
+    </h1>
+
+    {{-- ====================== --}}
+    {{-- 1. Grafik Cup Terjual per Driver --}}
+    {{-- ====================== --}}
+    <div class="bg-white shadow rounded-xl p-6">
+        <h2 class="text-lg font-semibold mb-3 text-gray-700">
+            ☕ Jumlah Cup Terjual per Driver
+        </h2>
+        <div class="relative h-80">
+            <canvas id="chartCupDriver"></canvas>
+        </div>
     </div>
 
-    <!-- Grafik Pendapatan per Driver -->
-    <div class="bg-white shadow rounded-xl p-4">
-        <h3 class="text-lg font-semibold mb-3">Total Pendapatan per Driver</h3>
-        <canvas id="chartPendapatanPerDriver"></canvas>
+    {{-- ====================== --}}
+    {{-- 2. Grafik Pendapatan per Driver (Line Harian) --}}
+    {{-- ====================== --}}
+    <div class="bg-white shadow rounded-xl p-6">
+        <h2 class="text-lg font-semibold mb-3 text-gray-700">
+            💰 Pendapatan Harian per Driver
+        </h2>
+        <div class="relative h-96">
+            <canvas id="chartPendapatanDriverHarian"></canvas>
+        </div>
     </div>
+
+    {{-- ====================== --}}
+    {{-- 3. Grafik Pendapatan Total per Driver --}}
+    {{-- ====================== --}}
+    <div class="bg-white shadow rounded-xl p-6">
+        <h2 class="text-lg font-semibold mb-3 text-gray-700">
+            📊 Total Pendapatan per Driver
+        </h2>
+        <div class="relative h-80">
+            <canvas id="chartPendapatanTotalDriver"></canvas>
+        </div>
+    </div>
+
 </div>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Global penyimpanan chart aktif
-    if (window.chartInstances === undefined) window.chartInstances = {};
-
-    // Fungsi bantu untuk membuat chart tanpa duplikat
-    function createChart(id, config) {
-        if (window.chartInstances[id]) window.chartInstances[id].destroy();
-        window.chartInstances[id] = new Chart(document.getElementById(id), config);
-    }
 
     // =========================
-    // 1. Bar Chart: Bahan Terpakai Hari Ini
+    // 1. Bar Chart: Cup Terjual per Driver
     // =========================
-    createChart("barChart", {
-        type: "bar",
+    const ctxCupDriver = document.getElementById('chartCupDriver').getContext('2d');
+    const cupDriverLabels = @json(array_keys($cupTerjualPerDriver ?? []));
+    const cupDriverData = @json(array_values($cupTerjualPerDriver ?? []));
+
+    new Chart(ctxCupDriver, {
+        type: 'bar',
         data: {
-            labels: @json($laporanToday->pluck('stock.nama_bahan')),
+            labels: cupDriverLabels,
             datasets: [{
-                label: "Jumlah Stok Dipakai Hari ini",
-                data: @json($laporanToday->pluck('jumlah_digunakan')),
-                backgroundColor: "#10b981",
-                borderRadius: 5
-            }],
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } },
-        },
-    });
-
-    // =========================
-    // 2. Doughnut Chart: Perbandingan Bahan Terpakai
-    // =========================
-    createChart("doughnutChart", {
-        type: "doughnut",
-        data: {
-            labels: @json($laporanToday->pluck('stock.nama_bahan')),
-            datasets: [{
-                data: @json($laporanToday->pluck('jumlah_digunakan')),
-                backgroundColor: [
-                    "#3b82f6",
-                    "#f59e0b",
-                    "#ef4444",
-                    "#10b981",
-                    "#8b5cf6",
-                    "#ec4899",
-                ],
-            }],
+                label: 'Cup Terjual',
+                data: cupDriverData,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderRadius: 6,
+                borderWidth: 1
+            }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { position: "bottom" },
+                legend: { display: false },
                 title: {
                     display: true,
-                    text: "Persentase Bahan Dipakai Hari Ini",
+                    text: 'Jumlah Cup Terjual per Driver'
                 },
-            },
-        },
-    });
-
-    // =========================
-    // 3. Line Chart: Stok Bahan (mingguan)
-    // =========================
-    createChart("lineChart", {
-        type: "line",
-        data: {
-            labels: @json($stokMingguan->pluck('tanggal')),
-            datasets: [{
-                label: "Total Stok Bahan",
-                data: @json($stokMingguan->pluck('total_stok')),
-                fill: false,
-                borderColor: "#3b82f6",
-                tension: 0.3,
-            }],
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true } },
-        },
-    });
-
-    // =========================
-    // 4. Bar Chart: Penjualan Harian
-    // =========================
-    createChart("chartPenjualanHarian", {
-        type: "bar",
-        data: {
-            labels: @json($penjualanHarian->pluck('tanggal')),
-            datasets: [{
-                label: "Total Penjualan (Rp)",
-                data: @json($penjualanHarian->pluck('total_penjualan')),
-                backgroundColor: "#3b82f6",
-                borderRadius: 5,
-            }],
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: { display: true, text: "📊 Penjualan Harian" },
-                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.parsed.y} Cup`
+                    }
+                }
             },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: value => 'Rp ' + value.toLocaleString('id-ID')
-                    }
-                },
-            },
-        },
+                y: { beginAtZero: true, title: { display: true, text: 'Jumlah Cup' } }
+            }
+        }
     });
 
     // =========================
-    // 5. Doughnut Chart: Produk Terlaris
+    // 2. Line Chart: Pendapatan Harian per Driver
     // =========================
-    createChart("chartProdukTerlaris", {
-        type: "doughnut",
-        data: {
-            labels: @json($produkTerlaris->pluck('nama_produk')),
-            datasets: [{
-                data: @json($produkTerlaris->pluck('jumlah_terjual')),
-                backgroundColor: [
-                    "#3b82f6",
-                    "#f59e0b",
-                    "#10b981",
-                    "#ef4444",
-                    "#8b5cf6",
-                ],
-            }],
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: { display: true, text: "🔥 Produk Terlaris Minggu Ini" },
-                legend: { position: "bottom" },
-            },
-        },
-    });
+    const ctxPendapatanDriver = document.getElementById('chartPendapatanDriverHarian').getContext('2d');
+    const pendapatanData = @json($pendapatanDriverHarian ?? []);
 
-    // =========================
-    // 6. Line Chart: Pendapatan Mingguan
-    // =========================
-    createChart("chartPendapatanMingguan", {
-        type: "line",
-        data: {
-            labels: @json($pendapatanMingguan->pluck('tanggal')),
-            datasets: [{
-                label: "Total Pendapatan (Rp)",
-                data: @json($pendapatanMingguan->pluck('total_pendapatan')),
-                borderColor: "#10b981",
-                backgroundColor: "#10b981",
-                fill: false,
-                tension: 0.3,
-                pointRadius: 3,
-            }],
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: { display: true, text: "💰 Pendapatan Mingguan" },
-                legend: { display: false },
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: value => 'Rp ' + value.toLocaleString('id-ID')
-                    }
-                },
-            },
-        },
-    });
-
-    // =========================
-    // 7. Line Chart: Pendapatan Harian per Driver
-    // =========================
-    const pendapatanData = @json($pendapatanDriverHarian);
     const warna = [
         'rgba(54, 162, 235, 0.8)',
         'rgba(255, 99, 132, 0.8)',
@@ -826,7 +724,7 @@ document.addEventListener("DOMContentLoaded", function() {
         'rgba(255, 159, 64, 0.8)',
     ];
 
-    const datasets = Object.entries(pendapatanData).map(([driver, items], i) => {
+    const datasetsPendapatan = Object.entries(pendapatanData).map(([driver, items], i) => {
         const sorted = items.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
         return {
             label: driver,
@@ -840,9 +738,9 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     });
 
-    createChart("chartPendapatanDriverHarian", {
-        type: "line",
-        data: { datasets },
+    new Chart(ctxPendapatanDriver, {
+        type: 'line',
+        data: { datasets: datasetsPendapatan },
         options: {
             responsive: true,
             parsing: false,
@@ -859,21 +757,53 @@ document.addEventListener("DOMContentLoaded", function() {
                 y: {
                     beginAtZero: true,
                     title: { display: true, text: 'Pendapatan (Rp)' },
-                    ticks: {
-                        callback: v => 'Rp ' + v.toLocaleString('id-ID')
-                    }
+                    ticks: { callback: v => 'Rp ' + v.toLocaleString('id-ID') }
                 }
             },
             plugins: {
-                title: {
-                    display: true,
-                    text: '📈 Grafik Pendapatan Harian per Driver'
-                },
                 legend: { position: 'bottom' },
                 tooltip: {
                     callbacks: {
                         label: ctx => `${ctx.dataset.label}: Rp ${ctx.parsed.y.toLocaleString('id-ID')}`
                     }
+                }
+            }
+        }
+    });
+
+    // =========================
+    // 3. Bar Chart: Pendapatan Total per Driver
+    // =========================
+    const ctxTotalPendapatan = document.getElementById('chartPendapatanTotalDriver').getContext('2d');
+    const totalDriverLabels = @json(array_keys($totalPendapatanPerDriver ?? []));
+    const totalDriverData = @json(array_values($totalPendapatanPerDriver ?? []));
+
+    new Chart(ctxTotalPendapatan, {
+        type: 'bar',
+        data: {
+            labels: totalDriverLabels,
+            datasets: [{
+                label: 'Total Pendapatan (Rp)',
+                data: totalDriverData,
+                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Total Pendapatan per Driver' },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => 'Rp ' + ctx.parsed.y.toLocaleString('id-ID')
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: v => 'Rp ' + v.toLocaleString('id-ID') },
+                    title: { display: true, text: 'Total Pendapatan' }
                 }
             }
         }
