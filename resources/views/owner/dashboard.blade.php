@@ -38,14 +38,14 @@
     <!-- Statistik Ringkas -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white p-4 shadow rounded-lg">
-            <p class="text-gray-500">Total Keuntungan</p>
+            <p class="text-gray-500">Profit</p>
             <h2 class="text-2xl font-bold">
                 Rp{{ number_format($totalKeuntunganSemua ?? 0, 0, ",", ".") }}
             </h2>
             <a href="#" class="text-blue-500 text-sm">View data →</a>
         </div>
         <div class="bg-white p-4 shadow rounded-lg">
-            <p class="text-gray-500">Pendapatan Total</p>
+            <p class="text-gray-500">Omset</p>
             <h2 class="text-2xl font-bold">
                 Rp{{ number_format($totalPendapatan ?? 0, 0, ",", ".") }}
             </h2>
@@ -53,7 +53,7 @@
         </div>
 
         <div class="bg-white p-4 shadow rounded-lg">
-            <p class="text-gray-500">Total Minuman Terjual</p>
+            <p class="text-gray-500">Minuman Terjual</p>
             <h2 class="text-2xl font-bold">{{ $totalOrdersAllTime ?? 0 }}</h2>
             <a href="#" class="text-blue-500 text-sm">View data →</a>
         </div>
@@ -61,6 +61,69 @@
             <p class="text-gray-500">Stock Tersedia</p>
             <h2 class="text-2xl font-bold">{{ $totalStock ?? 0 }}</h2>
             <a href="#" class="text-blue-500 text-sm">View data →</a>
+        </div>
+    </div>
+
+    <!-- Data User -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10 mt-6">
+        @foreach(['Admin' => $adminUsers, 'Driver' => $driverUsers, 'Produksi'
+        => $produksiUsers] as $role => $users)
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h2 class="text-lg font-semibold mb-4">
+                @if($role == 'Admin') 👨‍💼 @elseif($role == 'Driver') 🚗 @else 🍽️
+                @endif Data {{ $role }}
+            </h2>
+            <div class="overflow-x-auto">
+                <table
+                    class="w-full text-sm text-left border border-gray-200 rounded-lg"
+                >
+                    <thead class="bg-gray-100 text-gray-700">
+                        <tr>
+                            <th class="p-2 border">#</th>
+                            <th class="p-2 border">Nama</th>
+                            <th class="p-2 border">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $key => $user)
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-2 border">{{ $key + 1 }}</td>
+                            <td class="p-2 border">{{ $user->name }}</td>
+                            <td class="p-2 border">{{ $user->email }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    <!-- Chart: Keuntungan Minuman -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="mt-8 bg-white p-4 rounded-xl shadow">
+            <h2 class="text-lg font-semibold mb-3 text-gray-800">
+                💰 Grafik Keuntungan Minuman
+            </h2>
+            <div class="h-80">
+                <!-- tinggi dibatasi agar tidak terlalu besar -->
+                <canvas id="keuntunganChart"></canvas>
+            </div>
+        </div>
+        <div class="p-4 bg-white rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold mb-3">
+                📊 Penjualan vs Keuntungan Bulanan
+            </h2>
+            <div style="height: 320px">
+                <canvas id="penjualanProfitChart"></canvas>
+            </div>
+        </div>
+        <!-- 📊 Grafik Penjualan Minuman Terlaris -->
+        <div class="bg-white p-6 rounded-xl shadow mt-8">
+            <h2 class="text-xl font-semibold mb-4">
+                🥤 Penjualan Minuman Terlaris
+            </h2>
+            <canvas id="penjualanMinumanChart" height="120"></canvas>
         </div>
     </div>
 
@@ -134,34 +197,6 @@
         </style>
     </div>
 
-    <!-- Chart: Keuntungan Minuman -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="mt-8 bg-white p-4 rounded-xl shadow">
-            <h2 class="text-lg font-semibold mb-3 text-gray-800">
-                💰 Grafik Keuntungan Minuman
-            </h2>
-            <div class="h-80">
-                <!-- tinggi dibatasi agar tidak terlalu besar -->
-                <canvas id="keuntunganChart"></canvas>
-            </div>
-        </div>
-        <div class="p-4 bg-white rounded-lg shadow-md">
-            <h2 class="text-lg font-semibold mb-3">
-                📊 Penjualan vs Keuntungan Bulanan
-            </h2>
-            <div style="height: 320px">
-                <canvas id="penjualanProfitChart"></canvas>
-            </div>
-        </div>
-        <!-- 📊 Grafik Penjualan Minuman Terlaris -->
-        <div class="bg-white p-6 rounded-xl shadow mt-8">
-            <h2 class="text-xl font-semibold mb-4">
-                🥤 Penjualan Minuman Terlaris
-            </h2>
-            <canvas id="penjualanMinumanChart" height="120"></canvas>
-        </div>
-    </div>
-
     <!-- Statistik Ringkas Warna -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 mt-6">
         <div
@@ -176,7 +211,7 @@
         <div
             class="bg-purple-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
         >
-            <h2 class="text-lg font-semibold">Cup Terjual</h2>
+            <h2 class="text-lg font-semibold">Cup Terjual Hari Ini</h2>
             <p class="text-2xl font-bold mt-2">
                 {{ $totalCupTerjual ?? 0 }} cup
             </p>
@@ -184,16 +219,16 @@
         <div
             class="bg-yellow-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
         >
-            <h2 class="text-lg font-semibold">Expired</h2>
+            <h2 class="text-lg font-semibold">Expired Hari Ini</h2>
             <p class="text-2xl font-bold mt-2">{{ $totalExpired ?? 0 }} cup</p>
         </div>
         <div
             class="bg-red-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
         >
-            <h2 class="text-lg font-semibold">Tumpah</h2>
+            <h2 class="text-lg font-semibold">Tumpah Hari Ini</h2>
             <p class="text-2xl font-bold mt-2">{{ $totalTumpah ?? 0 }} cup</p>
         </div>
-    </div>
+    </div> 
 
     <div class="p-4 bg-white shadow rounded-lg mt-6">
     <h3 class="text-lg font-semibold mb-2">Grafik Pendapatan Harian per Driver</h3>
@@ -262,140 +297,6 @@
         </div>
     </div>
 
-    <!-- Grafik Stok Terpakai -->
-    <div class="bg-white p-4 shadow rounded-lg mb-8 mt-6">
-        <h2 class="text-xl font-semibold mb-2">📊 Grafik Stock</h2>
-        <canvas id="stokTerpakaiChart" class="w-full h-64"></canvas>
-    </div>
-
-    <!-- 📊 Data Keuntungan dan Margin -->
-    <div class="bg-white p-6 rounded-xl shadow mt-8">
-        <h2 class="text-xl font-semibold mb-4">
-            💰 Keuntungan & Margin Minuman
-        </h2>
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm border border-gray-200 rounded-lg">
-                <thead class="bg-gray-100 text-gray-700">
-                    <tr class="text-center font-semibold">
-                        <th class="p-3 border">#</th>
-                        <th class="p-3 border text-left">Nama Minuman</th>
-                        <th class="p-3 border text-right">Harga Jual</th>
-                        <th class="p-3 border text-right">HPP</th>
-                        <th class="p-3 border text-right">Keuntungan / Cup</th>
-                        <th class="p-3 border text-center">Margin (%)</th>
-                        <th class="p-3 border">Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @forelse($minumans as $key => $m)
-                    <tr class="hover:bg-gray-50 even:bg-gray-50/50">
-                        <td class="p-3 border text-center">{{ $key + 1 }}</td>
-                        <td class="p-3 border text-left">{{ $m->nama }}</td>
-                        <td class="p-3 border text-right">
-                            Rp {{ number_format($m->harga, 0, ',', '.') }}
-                        </td>
-                        <td class="p-3 border text-right">
-                            Rp {{ number_format($m->hpp ?? 0, 0, ',', '.') }}
-                        </td>
-                        <td
-                            class="p-3 border text-right font-semibold text-green-600"
-                        >
-                            Rp {{ number_format($m->keuntungan, 0, ',', '.') }}
-                        </td>
-                        <td class="p-3 border text-center">
-                            @php $margin = $m->margin ?? 0; $color = $margin >=
-                            50 ? 'text-green-600 font-bold' : ($margin >= 30 ?
-                            'text-yellow-600 font-semibold' : 'text-red-600
-                            font-semibold'); @endphp
-                            <span class="{{ $color }}">
-                                {{ number_format($margin, 2, ",", ".") }}%
-                            </span>
-                        </td>
-                        <td class="p-3 border text-center">
-                            <a
-                                href="{{ route('owner.minuman.edit', $m->id) }}"
-                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
-                            >
-                                ✏️ Edit HPP
-                            </a>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td
-                            colspan="7"
-                            class="p-4 text-center text-gray-500 italic"
-                        >
-                            Belum ada data minuman.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-
-                @if($minumans->count() > 0)
-                <tfoot class="bg-gray-100 text-gray-800 font-bold">
-                    <tr>
-                        <td colspan="4" class="p-2 border text-left">
-                            TOTAL KEUNTUNGAN
-                        </td>
-                        <td class="p-3 border text-left text-green-700">
-                            Rp
-                            {{ number_format($minumans->sum->keuntungan, 0, ',', '.') }}
-                        </td>
-                        <td colspan="3" class="p-3 border"></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" class="p-3 border text-left">
-                            RATA-RATA MARGIN
-                        </td>
-                        <td colspan="3" class="p-3 border text-left">
-                            {{ number_format($minumans->avg->margin, 2, ',', '.') 
-
-                            }}%
-                        </td>
-                    </tr>
-                </tfoot>
-                @endif
-            </table>
-        </div>
-    </div>
-
-    <!-- Data User -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10 mt-6">
-        @foreach(['Admin' => $adminUsers, 'Driver' => $driverUsers, 'Produksi'
-        => $produksiUsers] as $role => $users)
-        <div class="bg-white p-6 rounded-xl shadow">
-            <h2 class="text-lg font-semibold mb-4">
-                @if($role == 'Admin') 👨‍💼 @elseif($role == 'Driver') 🚗 @else 🍽️
-                @endif Data {{ $role }}
-            </h2>
-            <div class="overflow-x-auto">
-                <table
-                    class="w-full text-sm text-left border border-gray-200 rounded-lg"
-                >
-                    <thead class="bg-gray-100 text-gray-700">
-                        <tr>
-                            <th class="p-2 border">#</th>
-                            <th class="p-2 border">Nama</th>
-                            <th class="p-2 border">Email</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($users as $key => $user)
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-2 border">{{ $key + 1 }}</td>
-                            <td class="p-2 border">{{ $user->name }}</td>
-                            <td class="p-2 border">{{ $user->email }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        @endforeach
-    </div>
     <!-- Rincian Pendapatan Per User Hari Ini -->
     <div class="bg-white p-6 rounded-xl shadow mb-10">
         <h2 class="text-lg font-semibold mb-4">
@@ -527,6 +428,12 @@
         </div>
     </div>
 
+    <!-- Grafik Stok Terpakai -->
+    <div class="bg-white p-4 shadow rounded-lg mb-8 mt-6">
+        <h2 class="text-xl font-semibold mb-2">📊 Grafik Stock</h2>
+        <canvas id="stokTerpakaiChart" class="w-full h-64"></canvas>
+    </div>
+
     <!-- Rincian Produksi Hari Ini -->
     <div class="bg-white p-6 rounded-xl shadow">
         <h2 class="text-lg font-semibold mb-4">
@@ -617,6 +524,100 @@
         @endif
     </div>
 </div>
+
+    <!-- 📊 Data Keuntungan dan Margin -->
+    <div class="bg-white p-6 rounded-xl shadow mt-8">
+        <h2 class="text-xl font-semibold mb-4">
+            💰 Keuntungan & Margin Minuman
+        </h2>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm border border-gray-200 rounded-lg">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr class="text-center font-semibold">
+                        <th class="p-3 border">#</th>
+                        <th class="p-3 border text-left">Nama Minuman</th>
+                        <th class="p-3 border text-right">Harga Jual</th>
+                        <th class="p-3 border text-right">HPP</th>
+                        <th class="p-3 border text-right">Keuntungan / Cup</th>
+                        <th class="p-3 border text-center">Margin (%)</th>
+                        <th class="p-3 border">Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse($minumans as $key => $m)
+                    <tr class="hover:bg-gray-50 even:bg-gray-50/50">
+                        <td class="p-3 border text-center">{{ $key + 1 }}</td>
+                        <td class="p-3 border text-left">{{ $m->nama }}</td>
+                        <td class="p-3 border text-right">
+                            Rp {{ number_format($m->harga, 0, ',', '.') }}
+                        </td>
+                        <td class="p-3 border text-right">
+                            Rp {{ number_format($m->hpp ?? 0, 0, ',', '.') }}
+                        </td>
+                        <td
+                            class="p-3 border text-right font-semibold text-green-600"
+                        >
+                            Rp {{ number_format($m->keuntungan, 0, ',', '.') }}
+                        </td>
+                        <td class="p-3 border text-center">
+                            @php $margin = $m->margin ?? 0; $color = $margin >=
+                            50 ? 'text-green-600 font-bold' : ($margin >= 30 ?
+                            'text-yellow-600 font-semibold' : 'text-red-600
+                            font-semibold'); @endphp
+                            <span class="{{ $color }}">
+                                {{ number_format($margin, 2, ",", ".") }}%
+                            </span>
+                        </td>
+                        <td class="p-3 border text-center">
+                            <a
+                                href="{{ route('owner.minuman.edit', $m->id) }}"
+                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                            >
+                                ✏️ Edit HPP
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td
+                            colspan="7"
+                            class="p-4 text-center text-gray-500 italic"
+                        >
+                            Belum ada data minuman.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+
+                @if($minumans->count() > 0)
+                <tfoot class="bg-gray-100 text-gray-800 font-bold">
+                    <tr>
+                        <td colspan="4" class="p-2 border text-left">
+                            TOTAL KEUNTUNGAN
+                        </td>
+                        <td class="p-3 border text-left text-green-700">
+                            Rp
+                            {{ number_format($minumans->sum->keuntungan, 0, ',', '.') }}
+                        </td>
+                        <td colspan="3" class="p-3 border"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="p-3 border text-left">
+                            RATA-RATA MARGIN
+                        </td>
+                        <td colspan="3" class="p-3 border text-left">
+                            {{ number_format($minumans->avg->margin, 2, ',', '.') 
+
+                            }}%
+                        </td>
+                    </tr>
+                </tfoot>
+                @endif
+            </table>
+        </div>
+    </div>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
