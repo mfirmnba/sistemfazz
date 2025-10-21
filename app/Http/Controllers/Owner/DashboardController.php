@@ -242,6 +242,14 @@ class DashboardController extends Controller
                     'total_pendapatan' => (float) $row->total_pendapatan,
                 ];
             }
+            // =============================================================
+            // 🔹 Stok Mingguan (Grafik total stok bahan selama 7 hari terakhir)
+            // =============================================================
+            $stokMingguan = LaporanProduksi::selectRaw('DATE(tanggal) as tanggal, SUM(jumlah_digunakan) as total_stok')
+                ->whereBetween('tanggal', [now()->subDays(6), now()])
+                ->groupBy('tanggal')
+                ->orderBy('tanggal')
+                ->get();
 
         return view('owner.dashboard', compact(
             'minumans',
@@ -271,7 +279,8 @@ class DashboardController extends Controller
             'pendapatanDriverHarian', 
             'minumanTerjualPerDriverToday',
             'pendapatanSemuaDriverHarian',
-            'minumanTerjualPerHari'
+            'minumanTerjualPerHari',
+             'stokMingguan'
         ));
 
         }
