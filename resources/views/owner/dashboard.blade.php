@@ -235,7 +235,7 @@
 {{-- ============================= --}}
 <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow p-4">
     <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-4">
-        Grafik Penjualan & Pendapatan per Driver
+        Grafik Penjualan & Omset Rider
     </h2>
     {{-- ✅ Bungkus canvas dalam div tinggi tetap --}}
     <div style="height: 300px; width: 100%;">
@@ -246,7 +246,7 @@
     <!-- 🥤 Minuman Terjual Hari Ini per Driver -->
     <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
         <h2 class="text-xl font-semibold mb-4">
-            🥤 Minuman Terjual Hari Ini per Driver
+            🥤 Minuman Terjual Hari Ini per Rider
         </h2>
 
         <div class="overflow-x-auto">
