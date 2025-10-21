@@ -107,7 +107,6 @@
             }
         }
     </style>
-    @yield('scripts')
 
     <body class="bg-gray-100 font-sans" x-data="{ sidebarOpen: false }">
         <div class="flex min-h-screen">
@@ -206,5 +205,6 @@
                 <main class="p-6">@yield('content')</main>
             </div>
         </div>
+        @yield('scripts')
     </body>
 </html>
