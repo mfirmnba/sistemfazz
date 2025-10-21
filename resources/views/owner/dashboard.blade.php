@@ -129,12 +129,10 @@
 
     <!-- Chart Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-6">
-        <!-- Bar Chart: Bahan Terpakai Hari Ini -->
-        <div
-            class="bg-white p-4 shadow rounded-lg transform transition duration-700 hover:scale-105 animate-fade-in"
-        >
-            <h3 class="text-lg font-semibold mb-3">Stock Terpakai</h3>
-            <canvas id="barChart"></canvas>
+        <!-- Grafik Stok Terpakai -->
+        <div class="bg-white p-4 shadow rounded-lg mb-8 mt-6">
+            <h2 class="text-xl font-semibold mb-2"> Grafik Stock</h2>
+            <canvas id="stokTerpakaiChart" class="w-full h-64"></canvas>
         </div>
 
         <!-- Doughnut Chart: Stock -->
@@ -401,11 +399,13 @@
         @endif
     </div>
 
-    <!-- Grafik Stok Terpakai -->
-    <div class="bg-white p-4 shadow rounded-lg mb-8 mt-6">
-        <h2 class="text-xl font-semibold mb-2"> Grafik Stock</h2>
-        <canvas id="stokTerpakaiChart" class="w-full h-64"></canvas>
-    </div>
+     <!-- Bar Chart: Bahan Terpakai Hari Ini -->
+        <div
+            class="bg-white p-4 shadow rounded-lg transform transition duration-700 hover:scale-105 animate-fade-in"
+        >
+            <h3 class="text-lg font-semibold mb-3">Stock Terpakai</h3>
+            <canvas id="barChart"></canvas>
+        </div>
 
     <!-- Rincian Stock -->
     <div class="bg-white p-6 rounded-xl shadow mb-10">
@@ -493,7 +493,7 @@
 
     <!-- Rincian Minuman Produksi (Hanya Tampilan) -->
     <div class="bg-white p-6 rounded-xl shadow mt-8">
-        <h2 class="text-lg font-semibold mb-4">🍹 Rincian Minuman Produksi</h2>
+        <h2 class="text-lg font-semibold mb-4"> Rincian Minuman Produksi</h2>
         @if($minumans->isEmpty())
         <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
             Belum ada minuman.
