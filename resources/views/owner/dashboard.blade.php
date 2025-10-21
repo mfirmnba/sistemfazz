@@ -632,69 +632,6 @@
         <canvas id="chartPendapatanPerDriver"></canvas>
     </div>
 </div>
-<div class="container mx-auto px-4 py-6">
-
-    {{-- Judul --}}
-    <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">📊 Dashboard Owner</h1>
-
-    {{-- Statistik Utama --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
-            <h2 class="text-sm text-gray-500">Total Pendapatan</h2>
-            <p class="text-2xl font-bold text-green-600">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
-        </div>
-        <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
-            <h2 class="text-sm text-gray-500">Pendapatan Hari Ini</h2>
-            <p class="text-2xl font-bold text-blue-600">Rp {{ number_format($totalPendapatanHariIni, 0, ',', '.') }}</p>
-        </div>
-        <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
-            <h2 class="text-sm text-gray-500">Total Cup Terjual</h2>
-            <p class="text-2xl font-bold text-amber-600">{{ $totalCupTerjual }}</p>
-        </div>
-        <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
-            <h2 class="text-sm text-gray-500">Total Stok Bahan</h2>
-            <p class="text-2xl font-bold text-indigo-600">{{ $totalStock }}</p>
-        </div>
-    </div>
-
-    {{-- Grafik Penjualan Bulanan --}}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4 mb-8">
-        <h2 class="text-lg font-semibold mb-3 text-gray-700 dark:text-gray-100">📈 Penjualan & Keuntungan Bulanan</h2>
-        <canvas id="chartPenjualan" height="100"></canvas>
-    </div>
-
-    {{-- Grafik Stok Mingguan --}}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4 mb-8">
-        <h2 class="text-lg font-semibold mb-3 text-gray-700 dark:text-gray-100">📦 Total Stok Bahan Mingguan</h2>
-        <canvas id="chartStokMingguan" height="100"></canvas>
-    </div>
-
-    {{-- Daftar Minuman Terjual --}}
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4 mb-8">
-        <h2 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-100">🥤 Minuman Terjual per Hari</h2>
-        <table class="min-w-full text-sm text-left border-collapse">
-            <thead class="border-b border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300">
-                <tr>
-                    <th class="py-2 px-3">Nama Minuman</th>
-                    <th class="py-2 px-3 text-right">Jumlah Terjual</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($minumanTerjualPerHari as $item)
-                    <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                        <td class="py-2 px-3">{{ $item->nama_minuman ?? '-' }}</td>
-                        <td class="py-2 px-3 text-right">{{ $item->total_terjual }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="3" class="py-3 text-center text-gray-500">Belum ada data penjualan.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-</div>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
