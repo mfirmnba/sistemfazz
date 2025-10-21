@@ -205,6 +205,5 @@
                 <main class="p-6">@yield('content')</main>
             </div>
         </div>
-        @yield('scripts')
     </body>
 </html>
