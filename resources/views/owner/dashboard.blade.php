@@ -127,60 +127,59 @@
         </div>
     </div>
 
-    <!-- Chart Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-6">
-        <!-- Grafik Stok Terpakai -->
-        <div class="bg-white p-4 shadow rounded-lg mb-8 mt-6">
-            <h2 class="text-xl font-semibold mb-2"> Grafik Stock</h2>
-            <canvas id="stokTerpakaiChart" class="w-full h-64"></canvas>
-        </div>
+    <!-- ============================= -->
+    <!-- 📊 Chart Grid -->
+    <!-- ============================= -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 mb-10">
 
-        <!-- Doughnut Chart: Stock -->
-        <div
-            class="bg-white p-4 shadow rounded-lg text-center transform transition duration-700 hover:scale-105 animate-fade-in delay-100"
-        >
-            <h3 class="text-lg font-semibold mb-3">Stock</h3>
-            <canvas id="doughnutChart" class="mx-auto"></canvas>
-            <p class="mt-3 text-gray-600">
-                Stock terpakai hari ini: {{ $bahanTerpakaiHariIni ?? 0 }}
-            </p>
-        </div>
-        
-        {{-- Grafik Gabungan: Penjualan & Pendapatan per Driver --}}
-        {{-- ============================= --}}
-        <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow p-4">
-            <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-4">
-                Grafik Penjualan & Omset Rider
+        <!-- 📦 Grafik Stok Terpakai -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-xl hover:shadow-lg transition duration-300">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
+                📦 Stok Terpakai
             </h2>
-            {{-- ✅ Bungkus canvas dalam div tinggi tetap --}}
-            <div style="height: 300px; width: 100%;">
-                <canvas id="chartGabungDriverLine"></canvas>
+            <div class="h-64">
+                <canvas id="stokTerpakaiChart" class="w-full h-full"></canvas>
             </div>
         </div>
 
-        <!-- Tailwind Animations -->
-        <style>
-            @keyframes fade-in {
-                0% {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                100% {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .animate-fade-in {
-                animation: fade-in 0.8s ease forwards;
-            }
-            .delay-100 {
-                animation-delay: 0.1s;
-            }
-            .delay-200 {
-                animation-delay: 0.2s;
-            }
-        </style>
+        <!-- 🍩 Doughnut Chart: Stock -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-xl text-center transform transition duration-500 hover:scale-[1.03] animate-fade-in delay-100">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
+                🍩 Komposisi Stock
+            </h3>
+            <div class="h-56 flex items-center justify-center">
+                <canvas id="doughnutChart"></canvas>
+            </div>
+            <p class="mt-3 text-gray-600 dark:text-gray-400 text-sm">
+                Stock terpakai hari ini: 
+                <span class="font-semibold text-green-600">{{ $bahanTerpakaiHariIni ?? 0 }}</span>
+            </p>
+        </div>
+
+        <!-- 🚴 Grafik Gabungan: Penjualan & Omset Rider -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-xl hover:shadow-lg transition duration-300 animate-fade-in delay-200">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
+                🚴 Penjualan & Omset Rider
+            </h2>
+            <div class="h-64 w-full">
+                <canvas id="chartGabungDriverLine" class="w-full h-full"></canvas>
+            </div>
+        </div>
+
     </div>
+
+    <!-- ============================= -->
+    <!-- ✨ Tailwind Animations -->
+    <!-- ============================= -->
+    <style>
+    @keyframes fade-in {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fade-in 0.8s ease forwards; }
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    </style>
 
     <!-- Statistik Ringkas Warna -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 mt-6">
