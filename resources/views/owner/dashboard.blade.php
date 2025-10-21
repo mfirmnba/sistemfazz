@@ -230,11 +230,6 @@
         </div>
     </div> 
 
-    <div class="p-4 bg-white shadow rounded-lg mt-6">
-    <h3 class="text-lg font-semibold mb-2">Grafik Pendapatan Harian per Driver</h3>
-    <canvas id="chartPendapatanDriverHarian" height="120"></canvas>
-    </div>
-
 {{-- ============================= --}}
 {{-- Grafik Gabungan: Penjualan & Pendapatan per Driver --}}
 {{-- ============================= --}}
@@ -247,6 +242,68 @@
         <canvas id="chartGabungDriverLine"></canvas>
     </div>
 </div>
+
+    <!-- 🥤 Minuman Terjual Hari Ini per Driver -->
+    <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
+        <h2 class="text-xl font-semibold mb-4">
+            🥤 Minuman Terjual Hari Ini per Driver
+        </h2>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm border border-gray-200 rounded-lg">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr class="text-center font-semibold">
+                        <th class="p-3 border w-12">#</th>
+                        <th class="p-3 border text-left">Nama Driver</th>
+                        <th class="p-3 border text-left">Nama Minuman</th>
+                        <th class="p-3 border text-center">Jumlah Terjual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $no = 1; @endphp @forelse($minumanTerjualPerDriverToday
+                    as $driverId => $items) @foreach($items as $item)
+                    <tr class="hover:bg-gray-50 even:bg-gray-50/50">
+                        <td class="p-3 border text-center">{{ $no++ }}</td>
+                        <td class="p-3 border text-left">
+                            {{ $item->user->name ?? '-' }}
+                        </td>
+                        <td class="p-3 border text-left">
+                            {{ $item->minuman->nama ?? '-' }}
+                        </td>
+                        <td
+                            class="p-3 border text-center font-semibold text-blue-600"
+                        >
+                            {{ $item->total_terjual }}
+                        </td>
+                    </tr>
+                    @endforeach @empty
+                    <tr>
+                        <td
+                            colspan="4"
+                            class="p-4 text-center text-gray-500 italic"
+                        >
+                            Belum ada data penjualan hari ini.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+
+                @if($minumanTerjualPerDriverToday &&
+                collect($minumanTerjualPerDriverToday)->flatten()->count() > 0)
+                <tfoot class="bg-gray-100 text-gray-800 font-bold">
+                    <tr>
+                        <td colspan="3" class="p-3 border text-left">
+                            TOTAL MINUMAN TERJUAL
+                        </td>
+                        <td class="p-3 border text-center text-green-700">
+                            {{ collect($minumanTerjualPerDriverToday)->flatten()->sum('total_terjual') }}
+                        </td>
+                    </tr>
+                </tfoot>
+                @endif
+            </table>
+        </div>
+    </div>
 
     <!-- Rincian Pendapatan Per User Hari Ini -->
     <div class="bg-white p-6 rounded-xl shadow mb-10 mt-6">
