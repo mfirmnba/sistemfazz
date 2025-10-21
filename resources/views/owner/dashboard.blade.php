@@ -70,7 +70,7 @@
         => $produksiUsers] as $role => $users)
         <div class="bg-white p-6 rounded-xl shadow">
             <h2 class="text-lg font-semibold mb-4">
-                @if($role == 'Admin') 👨‍💼 @elseif($role == 'Driver') 🚗 @else 🍽️
+                @if($role == 'Admin')  @elseif($role == 'Driver')  @else 
                 @endif Data {{ $role }}
             </h2>
             <div class="overflow-x-auto">
@@ -103,7 +103,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-6 ">
         <div class="mt-8 bg-white p-4 rounded-xl shadow">
             <h2 class="text-lg font-semibold mb-3 text-gray-800">
-                💰 Grafik Keuntungan Minuman
+                 Grafik Keuntungan Minuman
             </h2>
             <div class="h-80">
                 <!-- tinggi dibatasi agar tidak terlalu besar -->
@@ -112,7 +112,7 @@
         </div>
         <div class="p-4 bg-white rounded-lg shadow-md">
             <h2 class="text-lg font-semibold mb-3">
-                📊 Penjualan vs Keuntungan Bulanan
+                 Penjualan vs Keuntungan Bulanan
             </h2>
             <div style="height: 320px">
                 <canvas id="penjualanProfitChart"></canvas>
@@ -121,7 +121,7 @@
         <!-- 📊 Grafik Penjualan Minuman Terlaris -->
         <div class="bg-white p-6 rounded-xl shadow mt-8">
             <h2 class="text-xl font-semibold mb-4">
-                🥤 Penjualan Minuman Terlaris
+                 Penjualan Minuman Terlaris
             </h2>
             <canvas id="penjualanMinumanChart" height="120"></canvas>
         </div>
@@ -230,23 +230,23 @@
         </div>
     </div> 
 
-{{-- ============================= --}}
-{{-- Grafik Gabungan: Penjualan & Pendapatan per Driver --}}
-{{-- ============================= --}}
-<div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow p-4">
-    <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-4">
-        Grafik Penjualan & Omset Rider
-    </h2>
-    {{-- ✅ Bungkus canvas dalam div tinggi tetap --}}
-    <div style="height: 300px; width: 100%;">
-        <canvas id="chartGabungDriverLine"></canvas>
+    {{-- ============================= --}}
+    {{-- Grafik Gabungan: Penjualan & Pendapatan per Driver --}}
+    {{-- ============================= --}}
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+        <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-4">
+            Grafik Penjualan & Omset Rider
+        </h2>
+        {{-- ✅ Bungkus canvas dalam div tinggi tetap --}}
+        <div style="height: 300px; width: 100%;">
+            <canvas id="chartGabungDriverLine"></canvas>
+        </div>
     </div>
-</div>
 
     <!-- 🥤 Minuman Terjual Hari Ini per Driver -->
     <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
         <h2 class="text-xl font-semibold mb-4">
-            🥤 Minuman Terjual Hari Ini per Rider
+             Minuman Terjual Hari Ini per Rider
         </h2>
 
         <div class="overflow-x-auto">
@@ -308,7 +308,7 @@
     <!-- Rincian Pendapatan Per User Hari Ini -->
     <div class="bg-white p-6 rounded-xl shadow mb-10 mt-6">
         <h2 class="text-lg font-semibold mb-4">
-            📅 Pendapatan Rider (Hari Ini)
+             Pendapatan Rider (Hari Ini)
         </h2>
         @if($penjualanPerUserToday->isEmpty())
         <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
@@ -356,7 +356,7 @@
     <!-- Rincian Pendapatan Per User All Time -->
     <div class="bg-white p-6 rounded-xl shadow mb-10">
         <h2 class="text-lg font-semibold mb-4">
-            📊 Pendapatan Rider (All Time)
+             Pendapatan Rider (All Time)
         </h2>
         @if($penjualanPerUserAllTime->isEmpty())
         <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
