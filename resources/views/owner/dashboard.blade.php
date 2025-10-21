@@ -618,23 +618,14 @@
             </table>
         </div>
     </div>
-{{-- Tambahan Grafik: Penjualan & Pendapatan per Driver --}}
+{{-- Grafik Jumlah Cup & Pendapatan per Driver (Gabung 1 Chart) --}}
 {{-- ============================= --}}
-<div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- Grafik Jumlah Cup Terjual per Driver -->
+<div class="mt-10">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
         <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-3">
-            ☕ Jumlah Cup Terjual per Driver (All Time)
+            ☕ Jumlah Cup & 💰 Pendapatan per Driver (All Time)
         </h2>
-        <canvas id="chartCupDriver" height="150"></canvas>
-    </div>
-
-    <!-- Grafik Total Pendapatan per Driver -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
-        <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-3">
-            💰 Total Pendapatan per Driver (All Time)
-        </h2>
-        <canvas id="chartPendapatanDriver" height="150"></canvas>
+        <canvas id="chartGabungDriver" height="180"></canvas>
     </div>
 </div>
 
@@ -978,107 +969,97 @@
             });
 
             document.addEventListener("DOMContentLoaded", function () {
-            const dataDriver = @json($penjualanPerUserAllTime);
+    const dataDriver = @json($penjualanPerUserAllTime);
 
-            const labels = dataDriver.map(d => d.user?.name ?? 'Tanpa Nama');
-            const cupData = dataDriver.map(d => d.total_cup);
-            const pendapatanData = dataDriver.map(d => d.pendapatan);
+    const labels = dataDriver.map(d => d.user?.name ?? 'Tanpa Nama');
+    const cupData = dataDriver.map(d => d.total_cup);
+    const pendapatanData = dataDriver.map(d => d.pendapatan);
 
-            // ===== LINE CHART: Jumlah Cup Terjual per Driver =====
-            const ctxCup = document.getElementById('chartCupDriver');
-            if (ctxCup) {
-                new Chart(ctxCup, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Jumlah Cup Terjual',
-                            data: cupData,
-                            fill: true,
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderColor: 'rgba(255, 0, 0, 1)',
-                            borderWidth: 2,
-                            pointBackgroundColor: 'rgba(255, 0, 0, 1)',
-                            pointRadius: 5,
-                            tension: 0.3 // lengkung halus seperti contoh
-                        }]
+    // ===== GABUNG 2 DATASET DALAM 1 LINE CHART =====
+    const ctx = document.getElementById('chartGabungDriver');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Jumlah Cup Terjual',
+                        data: cupData,
+                        borderColor: 'rgba(255, 0, 0, 1)',
+                        backgroundColor: 'rgba(255, 0, 0, 0.15)',
+                        fill: true,
+                        borderWidth: 2,
+                        tension: 0.35,
+                        pointRadius: 5,
+                        pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                        yAxisID: 'y1'
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                labels: { color: '#000', boxWidth: 30, padding: 20 }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                ticks: { color: '#000', font: { weight: 'bold' } },
-                                grid: { display: false }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    color: '#000',
-                                    callback: v => v + ' Cup'
-                                },
-                                grid: { color: '#f1f1f1' }
-                            }
-                        }
+                    {
+                        label: 'Total Pendapatan (Rp)',
+                        data: pendapatanData,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        fill: true,
+                        borderWidth: 2,
+                        tension: 0.35,
+                        pointRadius: 5,
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                        yAxisID: 'y2'
                     }
-                });
-            }
-
-            // ===== LINE CHART: Total Pendapatan per Driver =====
-            const ctxPendapatan = document.getElementById('chartPendapatanDriver');
-            if (ctxPendapatan) {
-                new Chart(ctxPendapatan, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Total Pendapatan (Rp)',
-                            data: pendapatanData,
-                            fill: true,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 2,
-                            pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                            pointRadius: 5,
-                            tension: 0.3
-                        }]
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                stacked: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: { color: '#000', boxWidth: 30, padding: 20 }
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                labels: { color: '#000', boxWidth: 30, padding: 20 }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => 'Rp ' + ctx.parsed.y.toLocaleString('id-ID')
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                if (ctx.dataset.label.includes('Pendapatan')) {
+                                    return 'Rp ' + ctx.parsed.y.toLocaleString('id-ID');
+                                } else {
+                                    return ctx.parsed.y + ' Cup';
                                 }
                             }
-                        },
-                        scales: {
-                            x: {
-                                ticks: { color: '#000', font: { weight: 'bold' } },
-                                grid: { display: false }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    color: '#000',
-                                    callback: v => 'Rp ' + v.toLocaleString('id-ID')
-                                },
-                                grid: { color: '#f1f1f1' }
-                            }
                         }
                     }
-                });
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#000', font: { weight: 'bold' } },
+                        grid: { display: false }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'rgba(255, 0, 0, 1)',
+                            callback: v => v + ' Cup'
+                        },
+                        grid: { color: '#f1f1f1' }
+                    },
+                    y2: {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'rgba(54, 162, 235, 1)',
+                            callback: v => 'Rp ' + v.toLocaleString('id-ID')
+                        },
+                        grid: { drawOnChartArea: false }
+                    }
+                }
             }
         });
+    }
+});
 </script>
 
 <style>
