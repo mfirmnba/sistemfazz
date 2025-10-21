@@ -618,14 +618,16 @@
             </table>
         </div>
     </div>
-{{-- Grafik Jumlah Cup & Pendapatan per Driver (Gabung 1 Chart) --}}
+{{-- Grafik Jumlah Cup & Pendapatan per Driver (Gabung 1 Chart - Compact) --}}
 {{-- ============================= --}}
-<div class="mt-10">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
-        <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-3">
+<div class="mt-8">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-3">
+        <h2 class="text-base font-semibold text-gray-700 dark:text-gray-100 mb-2">
             ☕ Jumlah Cup & 💰 Pendapatan per Driver (All Time)
         </h2>
-        <canvas id="chartGabungDriver" height="180"></canvas>
+        <div class="w-full overflow-x-auto">
+            <canvas id="chartGabungDriver" height="120"></canvas>
+        </div>
     </div>
 </div>
 
@@ -968,14 +970,13 @@
                 });
             });
 
-            document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
     const dataDriver = @json($penjualanPerUserAllTime);
 
     const labels = dataDriver.map(d => d.user?.name ?? 'Tanpa Nama');
     const cupData = dataDriver.map(d => d.total_cup);
     const pendapatanData = dataDriver.map(d => d.pendapatan);
 
-    // ===== GABUNG 2 DATASET DALAM 1 LINE CHART =====
     const ctx = document.getElementById('chartGabungDriver');
     if (ctx) {
         new Chart(ctx, {
@@ -986,13 +987,13 @@
                     {
                         label: 'Jumlah Cup Terjual',
                         data: cupData,
-                        borderColor: 'rgba(255, 0, 0, 1)',
-                        backgroundColor: 'rgba(255, 0, 0, 0.15)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.15)',
                         fill: true,
-                        borderWidth: 2,
+                        borderWidth: 1.5,
                         tension: 0.35,
-                        pointRadius: 5,
-                        pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+                        pointRadius: 3,
+                        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
                         yAxisID: 'y1'
                     },
                     {
@@ -1001,9 +1002,9 @@
                         borderColor: 'rgba(54, 162, 235, 1)',
                         backgroundColor: 'rgba(54, 162, 235, 0.1)',
                         fill: true,
-                        borderWidth: 2,
+                        borderWidth: 1.5,
                         tension: 0.35,
-                        pointRadius: 5,
+                        pointRadius: 3,
                         pointBackgroundColor: 'rgba(54, 162, 235, 1)',
                         yAxisID: 'y2'
                     }
@@ -1011,14 +1012,20 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
-                stacked: false,
+                layout: { padding: 5 },
                 plugins: {
                     legend: {
                         display: true,
-                        labels: { color: '#000', boxWidth: 30, padding: 20 }
+                        labels: {
+                            color: '#000',
+                            boxWidth: 15,
+                            font: { size: 11 }
+                        }
                     },
                     tooltip: {
+                        bodyFont: { size: 11 },
                         callbacks: {
                             label: function(ctx) {
                                 if (ctx.dataset.label.includes('Pendapatan')) {
@@ -1032,7 +1039,7 @@
                 },
                 scales: {
                     x: {
-                        ticks: { color: '#000', font: { weight: 'bold' } },
+                        ticks: { color: '#333', font: { size: 10, weight: '500' } },
                         grid: { display: false }
                     },
                     y1: {
@@ -1040,10 +1047,11 @@
                         position: 'left',
                         beginAtZero: true,
                         ticks: {
-                            color: 'rgba(255, 0, 0, 1)',
+                            color: 'rgba(255, 99, 132, 1)',
+                            font: { size: 10 },
                             callback: v => v + ' Cup'
                         },
-                        grid: { color: '#f1f1f1' }
+                        grid: { color: '#f4f4f4' }
                     },
                     y2: {
                         type: 'linear',
@@ -1051,6 +1059,7 @@
                         beginAtZero: true,
                         ticks: {
                             color: 'rgba(54, 162, 235, 1)',
+                            font: { size: 10 },
                             callback: v => 'Rp ' + v.toLocaleString('id-ID')
                         },
                         grid: { drawOnChartArea: false }
