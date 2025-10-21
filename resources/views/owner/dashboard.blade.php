@@ -618,6 +618,25 @@
             </table>
         </div>
     </div>
+{{-- Tambahan Grafik: Penjualan & Pendapatan per Driver --}}
+{{-- ============================= --}}
+<div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Grafik Jumlah Cup Terjual per Driver -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+        <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-3">
+            ☕ Jumlah Cup Terjual per Driver (All Time)
+        </h2>
+        <canvas id="chartCupDriver" height="150"></canvas>
+    </div>
+
+    <!-- Grafik Total Pendapatan per Driver -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+        <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-3">
+            💰 Total Pendapatan per Driver (All Time)
+        </h2>
+        <canvas id="chartPendapatanDriver" height="150"></canvas>
+    </div>
+</div>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -957,6 +976,85 @@
                     }
                 });
             });
+
+            document.addEventListener("DOMContentLoaded", function () {
+            // Ambil data dari Laravel
+            const dataDriver = @json($penjualanPerUserAllTime);
+
+            // Pisahkan label dan data
+            const labels = dataDriver.map(d => d.user?.name ?? 'Tanpa Nama');
+            const cupData = dataDriver.map(d => d.total_cup);
+            const pendapatanData = dataDriver.map(d => d.pendapatan);
+
+            // ===== Grafik Jumlah Cup per Driver =====
+            const ctxCup = document.getElementById('chartCupDriver');
+            if (ctxCup) {
+                new Chart(ctxCup, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Cup Terjual',
+                            data: cupData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { font: { weight: 'bold' } } },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: v => v + " Cup"
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ===== Grafik Total Pendapatan per Driver =====
+            const ctxPendapatan = document.getElementById('chartPendapatanDriver');
+            if (ctxPendapatan) {
+                new Chart(ctxPendapatan, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Total Pendapatan (Rp)',
+                            data: pendapatanData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => 'Rp ' + ctx.parsed.y.toLocaleString('id-ID')
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: v => 'Rp ' + v.toLocaleString('id-ID')
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
 </script>
 
 <style>
