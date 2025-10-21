@@ -145,32 +145,19 @@
                 Stock terpakai hari ini: {{ $bahanTerpakaiHariIni ?? 0 }}
             </p>
         </div>
-
-        <!-- Line Chart: Total Cup Terjual -->
-        <div
-            class="bg-white p-4 shadow rounded-lg transform transition duration-700 hover:scale-105 animate-fade-in delay-200"
-        >
-            <h3 class="text-lg font-semibold mb-3">Minuman Terjual</h3>
-            <canvas id="lineChart"></canvas>
-            <div class="flex justify-around mt-2 text-sm">
-                <span class="text-green-600"
-                    >Expired: {{ $totalExpired ?? 0 }}</span
-                >
-                <span class="text-red-600"
-                    >Tumpah: {{ $totalTumpah ?? 0 }}</span
-                >
-            </div>
-            <div class="mt-4 flex justify-between text-sm">
-                <span>
-                    Rp
-                    {{
-                        number_format($totalPendapatanHariIni ?? 0, 0, ",", ".")
-                    }}
-                    Total
-                </span>
-                <span>{{ $totalCupTerjual ?? 0 }} Cup Terjual</span>
+        
+        {{-- Grafik Gabungan: Penjualan & Pendapatan per Driver --}}
+        {{-- ============================= --}}
+        <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+            <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-4">
+                Grafik Penjualan & Omset Rider
+            </h2>
+            {{-- ✅ Bungkus canvas dalam div tinggi tetap --}}
+            <div style="height: 300px; width: 100%;">
+                <canvas id="chartGabungDriverLine"></canvas>
             </div>
         </div>
+
         <!-- Tailwind Animations -->
         <style>
             @keyframes fade-in {
@@ -229,17 +216,31 @@
     </div> 
 
     {{-- ============================= --}}
-    {{-- Grafik Gabungan: Penjualan & Pendapatan per Driver --}}
-    {{-- ============================= --}}
-    <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow p-4">
-        <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-4">
-            Grafik Penjualan & Omset Rider
-        </h2>
-        {{-- ✅ Bungkus canvas dalam div tinggi tetap --}}
-        <div style="height: 300px; width: 100%;">
-            <canvas id="chartGabungDriverLine"></canvas>
+    <!-- Line Chart: Total Cup Terjual -->
+        <div
+            class="bg-white p-4 shadow rounded-lg transform transition duration-700 hover:scale-105 animate-fade-in delay-200"
+        >
+            <h3 class="text-lg font-semibold mb-3">Minuman Terjual</h3>
+            <canvas id="lineChart"></canvas>
+            <div class="flex justify-around mt-2 text-sm">
+                <span class="text-green-600"
+                    >Expired: {{ $totalExpired ?? 0 }}</span
+                >
+                <span class="text-red-600"
+                    >Tumpah: {{ $totalTumpah ?? 0 }}</span
+                >
+            </div>
+            <div class="mt-4 flex justify-between text-sm">
+                <span>
+                    Rp
+                    {{
+                        number_format($totalPendapatanHariIni ?? 0, 0, ",", ".")
+                    }}
+                    Total
+                </span>
+                <span>{{ $totalCupTerjual ?? 0 }} Cup Terjual</span>
+            </div>
         </div>
-    </div>
 
     <!-- 🥤 Minuman Terjual Hari Ini per Driver -->
     <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
