@@ -403,13 +403,13 @@
 
     <!-- Grafik Stok Terpakai -->
     <div class="bg-white p-4 shadow rounded-lg mb-8 mt-6">
-        <h2 class="text-xl font-semibold mb-2">📊 Grafik Stock</h2>
+        <h2 class="text-xl font-semibold mb-2"> Grafik Stock</h2>
         <canvas id="stokTerpakaiChart" class="w-full h-64"></canvas>
     </div>
 
     <!-- Rincian Stock -->
     <div class="bg-white p-6 rounded-xl shadow mb-10">
-        <h2 class="text-lg font-semibold mb-4">📦 Rincian Total Stock</h2>
+        <h2 class="text-lg font-semibold mb-4"> Rincian Total Stock</h2>
         <div class="overflow-x-auto">
             <table
                 class="w-full text-sm text-left border border-gray-200 rounded-lg"
@@ -445,7 +445,7 @@
     <!-- Rincian Produksi Hari Ini -->
     <div class="bg-white p-6 rounded-xl shadow">
         <h2 class="text-lg font-semibold mb-4">
-            📋 Rincian Bahan Terpakai Hari Ini
+             Rincian Bahan Terpakai Hari Ini
         </h2>
         @if($laporanToday->isEmpty())
         <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
@@ -536,7 +536,7 @@
     <!-- 📊 Data Keuntungan dan Margin -->
     <div class="bg-white p-6 rounded-xl shadow mt-8">
         <h2 class="text-xl font-semibold mb-4">
-            💰 Keuntungan & Margin Minuman
+             Keuntungan & Margin Minuman
         </h2>
 
         <div class="overflow-x-auto">
