@@ -1093,6 +1093,7 @@
     // 📊 Grafik Bulanan per Driver
     // ============================
     const dataBulanan = @json($grafikBulananDriver);
+    const ctxBulanan = document.getElementById('chartBulananDriver')?.getContext('2d');
     const bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
     const warna = [
         'rgba(54, 162, 235, 0.8)',
@@ -1123,7 +1124,6 @@
         };
     });
 
-    const ctxBulanan = document.getElementById('chartBulananDriver')?.getContext('2d');
     if (ctxBulanan) {
         new Chart(ctxBulanan, {
             type: 'line',
