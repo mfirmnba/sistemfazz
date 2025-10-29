@@ -97,30 +97,32 @@
         </div>
     </div> 
     
-    <!-- ========================================================= -->
-    <!-- 📊 Grafik Bulanan: Pendapatan & Cup Terjual per Driver -->
-    <!-- ========================================================= -->
-    <div class="mt-8 bg-white shadow rounded-xl p-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4 text-center">
-            📊 Grafik Bulanan Pendapatan & Cup Terjual per Driver
-        </h2>
-        <div class="w-full h-[400px]">
-            <canvas id="chartBulananDriver"></canvas>
-        </div>
-    </div>
+    <!-- ============================= -->
+    <!-- 📊 Chart Grid: Grafik Driver -->
+    <!-- ============================= -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-10">
 
-    <!-- ========================================================= -->
-    <!-- 📈 Grafik Tahunan: Pendapatan & Cup Terjual per Driver -->
-    <!-- ========================================================= -->
-    <div class="mt-8 bg-white shadow rounded-xl p-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4 text-center">
-            📈 Grafik Tahunan Pendapatan & Cup Terjual per Driver
-        </h2>
-        <div class="w-full h-[400px]">
-            <canvas id="chartTahunanDriver"></canvas>
+        <!-- 📊 Grafik Bulanan Pendapatan per Driver -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-xl hover:shadow-lg transition duration-300 animate-fade-in">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 text-center">
+                📊 Pendapatan Bulanan per Driver
+            </h2>
+            <div class="h-80 w-full flex items-center justify-center">
+                <canvas id="chartBulananDriver" class="w-full h-full"></canvas>
+            </div>
         </div>
-    </div>
 
+        <!-- 📈 Grafik Tahunan Pendapatan per Driver -->
+        <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-xl hover:shadow-lg transition duration-300 animate-fade-in delay-100">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 text-center">
+                📈 Pendapatan Tahunan per Driver
+            </h2>
+            <div class="h-80 w-full flex items-center justify-center">
+                <canvas id="chartTahunanDriver" class="w-full h-full"></canvas>
+            </div>
+        </div>
+
+    </div>
 
         <!-- 🥤 Minuman Terjual Hari Ini per Driver urutan nomor 3 -->
     <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
@@ -351,7 +353,7 @@
         <!-- 📦 Grafik Stok Terpakai -->
         <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-xl hover:shadow-lg transition duration-300">
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                📦 Stok Terpakai
+                Stok Terpakai
             </h2>
             <div class="h-64">
                 <canvas id="stokTerpakaiChart" class="w-full h-full"></canvas>
@@ -361,7 +363,7 @@
         <!-- 🍩 Doughnut Chart: Stock -->
         <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-xl text-center transform transition duration-500 hover:scale-[1.03] animate-fade-in delay-100">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                🍩 Komposisi Stock
+                Komposisi Stock
             </h3>
             <div class="h-56 flex items-center justify-center">
                 <canvas id="doughnutChart"></canvas>
@@ -375,7 +377,7 @@
         <!-- 🚴 Grafik Gabungan: Penjualan & Omset Rider -->
         <div class="bg-white dark:bg-gray-800 p-5 shadow rounded-xl hover:shadow-lg transition duration-300 animate-fade-in delay-200">
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                🚴 Penjualan & Omset Rider
+                Penjualan & Omset Rider
             </h2>
             <div class="h-64 w-full">
                 <canvas id="chartGabungDriverLine" class="w-full h-full"></canvas>
