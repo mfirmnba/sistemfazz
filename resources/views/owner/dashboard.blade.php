@@ -988,6 +988,119 @@
                     }
                 });
             });
+            document.addEventListener("DOMContentLoaded", function () {
+    const dataDriver = @json($penjualanPerUserAllTime);
+
+    const labels = dataDriver.map(d => d.user?.name ?? 'Tanpa Nama');
+    const cupData = dataDriver.map(d => d.total_cup);
+    const pendapatanData = dataDriver.map(d => d.pendapatan);
+
+    const ctx = document.getElementById("chartGabungDriverLine").getContext("2d");
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Jumlah Cup Terjual",
+                    data: cupData,
+                    borderColor: "#f87171",
+                    backgroundColor: "rgba(248,113,113,0.15)",
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#ef4444",
+                    yAxisID: "yCup"
+                },
+                {
+                    label: "Total Pendapatan (Rp)",
+                    data: pendapatanData,
+                    borderColor: "#3b82f6",
+                    backgroundColor: "rgba(59,130,246,0.15)",
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#2563eb",
+                    yAxisID: "yPendapatan"
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        color: "#111",
+                        boxWidth: 15,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: "rgba(30,41,59,0.9)",
+                    titleColor: "#fff",
+                    bodyColor: "#f3f4f6",
+                    cornerRadius: 6,
+                    padding: 12,
+                    callbacks: {
+                        label: function (ctx) {
+                            if (ctx.dataset.label.includes("Pendapatan")) {
+                                return "Pendapatan: Rp " + ctx.parsed.y.toLocaleString("id-ID");
+                            }
+                            return "Cup: " + ctx.parsed.y;
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: "📊 Jumlah Cup & Pendapatan per Driver",
+                    color: "#111827",
+                    font: { size: 16, weight: "bold" },
+                    padding: { bottom: 20 }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: "#333",
+                        font: { size: 11, weight: "500" }
+                    },
+                    grid: { display: false }
+                },
+                yCup: {
+                    type: "linear",
+                    display: true,
+                    position: "left",
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#ef4444",
+                        callback: v => v + " Cup"
+                    },
+                    grid: { color: "#f3f4f6" }
+                },
+                yPendapatan: {
+                    type: "linear",
+                    display: true,
+                    position: "right",
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#2563eb",
+                        callback: v => "Rp " + v.toLocaleString("id-ID")
+                    },
+                    grid: { drawOnChartArea: false }
+                }
+            }
+        }
+    });
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     // =========================
