@@ -1111,7 +1111,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     // =========================
-    // Plugin Legend Rapi (Grid)
+    // Plugin Legend Rapi (Vertikal)
     // =========================
     const htmlLegendPlugin = {
         id: 'htmlLegend',
@@ -1120,11 +1120,18 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!container) return;
             container.innerHTML = '';
 
+            // 🧩 Wrapper legend
             const list = document.createElement('div');
             list.style.display = 'flex';
+            list.style.flexDirection = 'column'; // ✅ susun ke bawah
+            list.style.alignItems = 'flex-start';
             list.style.flexWrap = 'wrap';
             list.style.justifyContent = 'center';
-            list.style.gap = '10px';
+            list.style.gap = '6px';
+            list.style.maxHeight = '200px';
+            list.style.overflowY = 'auto';
+            list.style.padding = '10px 20px';
+            list.style.borderTop = '1px solid #e5e7eb';
             list.style.marginTop = '10px';
 
             const items = chart.options.plugins.legend.labels.generateLabels(chart);
@@ -1132,9 +1139,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 const legendItem = document.createElement('div');
                 legendItem.style.display = 'flex';
                 legendItem.style.alignItems = 'center';
-                legendItem.style.gap = '6px';
-                legendItem.style.fontSize = '12px';
+                legendItem.style.gap = '8px';
+                legendItem.style.fontSize = '13px';
                 legendItem.style.color = '#374151';
+                legendItem.style.fontWeight = '500';
 
                 const box = document.createElement('span');
                 box.style.width = '12px';
@@ -1156,7 +1164,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // =========================
-    // 8. Grafik Bulanan per Driver (Cup & Pendapatan)
+    // 8. Grafik Bulanan per Driver
     // =========================
     const bulananEl = document.getElementById("chartBulananDriver");
     if (bulananEl) {
@@ -1170,7 +1178,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const nama = driver[0]?.nama_driver ?? 'Driver ' + (i + 1);
             const dataCup = Array(12).fill(0);
             const dataPendapatan = Array(12).fill(0);
-
             driver.forEach(d => {
                 const idx = parseInt(d.bulan) - 1;
                 if (idx >= 0 && idx < 12) {
@@ -1267,7 +1274,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =========================
-    // 9. Grafik Tahunan per Driver (Cup & Pendapatan)
+    // 9. Grafik Tahunan per Driver
     // =========================
     const tahunanEl = document.getElementById("chartTahunanDriver");
     if (tahunanEl) {
