@@ -259,7 +259,7 @@
         <!-- 📊 Grafik Bulanan -->
         <div class="w-1/2 min-w-[600px] bg-white dark:bg-gray-800 p-6 shadow rounded-xl hover:shadow-lg transition duration-300">
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 text-center">
-                📊 Grafik Bulanan Pendapatan & Cup Terjual per Driver
+                Grafik Bulanan Pendapatan & Cup Terjual per Driver
             </h2>
             <div class="h-[400px] w-full flex items-center justify-center">
                 <canvas id="chartBulananDriver" class="w-full h-full"></canvas>
@@ -272,7 +272,7 @@
         <!-- 📈 Grafik Tahunan -->
         <div class="w-1/2 min-w-[600px] bg-white dark:bg-gray-800 p-6 shadow rounded-xl hover:shadow-lg transition duration-300">
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 text-center">
-                📈 Grafik Tahunan Pendapatan & Cup Terjual per Driver
+                Grafik Tahunan Pendapatan & Cup Terjual per Driver
             </h2>
             <div class="h-[400px] w-full flex items-center justify-center">
                 <canvas id="chartTahunanDriver" class="w-full h-full"></canvas>
@@ -1067,7 +1067,7 @@
                 },
                 title: {
                     display: true,
-                    text: "📊 Jumlah Cup & Pendapatan per Driver",
+                    text: " Jumlah Cup & Pendapatan per Driver",
                     color: "#111827",
                     font: { size: 16, weight: "bold" },
                     padding: { bottom: 20 }
