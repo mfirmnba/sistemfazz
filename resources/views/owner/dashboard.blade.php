@@ -1111,7 +1111,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     // =========================
-    // Plugin Legend Rapi (Vertikal)
+    // Plugin Legend 2 Kolom: Cup di kiri, Pendapatan di kanan
     // =========================
     const htmlLegendPlugin = {
         id: 'htmlLegend',
@@ -1120,46 +1120,70 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!container) return;
             container.innerHTML = '';
 
-            // 🧩 Wrapper legend
-            const list = document.createElement('div');
-            list.style.display = 'flex';
-            list.style.flexDirection = 'column'; // ✅ susun ke bawah
-            list.style.alignItems = 'flex-start';
-            list.style.flexWrap = 'wrap';
-            list.style.justifyContent = 'center';
-            list.style.gap = '6px';
-            list.style.maxHeight = '200px';
-            list.style.overflowY = 'auto';
-            list.style.padding = '10px 20px';
-            list.style.borderTop = '1px solid #e5e7eb';
-            list.style.marginTop = '10px';
+            // 🔹 Wrapper legend
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'grid';
+            wrapper.style.gridTemplateColumns = '1fr 1fr'; // ✅ dua kolom
+            wrapper.style.gap = '8px 20px';
+            wrapper.style.alignItems = 'start';
+            wrapper.style.justifyContent = 'center';
+            wrapper.style.padding = '10px 20px';
+            wrapper.style.borderTop = '1px solid #e5e7eb';
+            wrapper.style.marginTop = '10px';
 
+            // Ambil semua legend items
             const items = chart.options.plugins.legend.labels.generateLabels(chart);
-            items.forEach(item => {
-                const legendItem = document.createElement('div');
-                legendItem.style.display = 'flex';
-                legendItem.style.alignItems = 'center';
-                legendItem.style.gap = '8px';
-                legendItem.style.fontSize = '13px';
-                legendItem.style.color = '#374151';
-                legendItem.style.fontWeight = '500';
 
-                const box = document.createElement('span');
-                box.style.width = '12px';
-                box.style.height = '12px';
-                box.style.borderRadius = '50%';
-                box.style.background = item.fillStyle;
-                box.style.border = '1px solid #d1d5db';
+            // Pisahkan antara Cup dan Pendapatan
+            const cupItems = items.filter(i => i.text.includes('Cup'));
+            const pendapatanItems = items.filter(i => i.text.includes('Pendapatan'));
 
-                const text = document.createElement('span');
-                text.textContent = item.text;
+            // Helper: buat satu grup kolom legend
+            function createColumn(title, listItems) {
+                const column = document.createElement('div');
+                column.style.display = 'flex';
+                column.style.flexDirection = 'column';
+                column.style.gap = '6px';
+                column.style.alignItems = 'flex-start';
 
-                legendItem.appendChild(box);
-                legendItem.appendChild(text);
-                list.appendChild(legendItem);
-            });
+                const titleEl = document.createElement('div');
+                titleEl.textContent = title;
+                titleEl.style.fontWeight = '600';
+                titleEl.style.color = '#111827';
+                titleEl.style.marginBottom = '4px';
+                column.appendChild(titleEl);
 
-            container.appendChild(list);
+                listItems.forEach(item => {
+                    const legendItem = document.createElement('div');
+                    legendItem.style.display = 'flex';
+                    legendItem.style.alignItems = 'center';
+                    legendItem.style.gap = '8px';
+                    legendItem.style.fontSize = '13px';
+                    legendItem.style.color = '#374151';
+
+                    const box = document.createElement('span');
+                    box.style.width = '12px';
+                    box.style.height = '12px';
+                    box.style.borderRadius = '50%';
+                    box.style.background = item.fillStyle;
+                    box.style.border = '1px solid #d1d5db';
+
+                    const text = document.createElement('span');
+                    text.textContent = item.text.replace(' - Cup', '').replace(' - Pendapatan', '');
+
+                    legendItem.appendChild(box);
+                    legendItem.appendChild(text);
+                    column.appendChild(legendItem);
+                });
+
+                return column;
+            }
+
+            // Tambahkan dua kolom: Cup dan Pendapatan
+            wrapper.appendChild(createColumn('Cup Terjual', cupItems));
+            wrapper.appendChild(createColumn('Pendapatan (Rp)', pendapatanItems));
+
+            container.appendChild(wrapper);
         }
     };
 
