@@ -1086,17 +1086,16 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
-    // =========================
-    // 8. Grafik Bulanan per Driver
-    // =========================
     const bulananEl = document.getElementById("chartBulananDriver");
     if (bulananEl) {
         const ctxBulanan = bulananEl.getContext("2d");
         const dataBulanan = @json($grafikBulananDriver);
+
         const warna = ['#36A2EB','#FF6384','#4BC0C0','#FFCE56','#9966FF','#FF9F40'];
         const bulanLabels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 
-        const datasetsBulanan = Object.values(dataBulanan).map((driver, i) => {
+        // Dataset Pendapatan (Line)
+        const datasetsPendapatan = Object.values(dataBulanan).map((driver, i) => {
             const nama = driver[0]?.nama_driver ?? 'Driver ' + (i + 1);
             const dataPendapatan = Array(12).fill(0);
             driver.forEach(d => {
@@ -1104,71 +1103,71 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (idx >= 0 && idx < 12) dataPendapatan[idx] = d.total_pendapatan ?? 0;
             });
             return {
-                label: nama,
+                label: `${nama} - Pendapatan (Rp)`,
                 data: dataPendapatan,
                 borderColor: warna[i % warna.length],
-                backgroundColor: warna[i % warna.length] + '33',
-                fill: true,
-                tension: 0.3
+                backgroundColor: warna[i % warna.length],
+                borderWidth: 2,
+                fill: false,
+                tension: 0.3,
+                yAxisID: 'yPendapatan'
+            };
+        });
+
+        // Dataset Cup (Bar)
+        const datasetsCup = Object.values(dataBulanan).map((driver, i) => {
+            const nama = driver[0]?.nama_driver ?? 'Driver ' + (i + 1);
+            const dataCup = Array(12).fill(0);
+            driver.forEach(d => {
+                const idx = parseInt(d.bulan) - 1;
+                if (idx >= 0 && idx < 12) dataCup[idx] = d.total_cup ?? 0;
+            });
+            return {
+                label: `${nama} - Cup Terjual`,
+                data: dataCup,
+                type: 'bar',
+                backgroundColor: warna[i % warna.length] + '55',
+                borderColor: warna[i % warna.length],
+                borderRadius: 4,
+                yAxisID: 'yCup'
             };
         });
 
         new Chart(ctxBulanan, {
-            type: "line",
-            data: { labels: bulanLabels, datasets: datasetsBulanan },
+            data: {
+                labels: bulanLabels,
+                datasets: [...datasetsCup, ...datasetsPendapatan]
+            },
             options: {
                 responsive: true,
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
                     legend: { position: "bottom" },
-                    title: { display: true, text: "Pendapatan Bulanan per Driver" }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { callback: v => 'Rp ' + v.toLocaleString('id-ID') }
+                    title: { display: true, text: "📊 Pendapatan & Cup Terjual per Driver (Bulanan)" },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                if (ctx.dataset.label.includes("Pendapatan"))
+                                    return ctx.dataset.label + ': Rp ' + ctx.parsed.y.toLocaleString('id-ID');
+                                return ctx.dataset.label + ': ' + ctx.parsed.y + ' Cup';
+                            }
+                        }
                     }
-                }
-            }
-        });
-    }
-
-    // =========================
-    // 9. Grafik Tahunan per Driver
-    // =========================
-    const tahunanEl = document.getElementById("chartTahunanDriver");
-    if (tahunanEl) {
-        const ctxTahunan = tahunanEl.getContext("2d");
-        const dataTahunan = @json($grafikTahunanDriver);
-        const warna = ['#36A2EB','#FF6384','#4BC0C0','#FFCE56','#9966FF','#FF9F40'];
-
-        const datasetsTahunan = Object.values(dataTahunan).map((driver, i) => {
-            const nama = driver[0]?.nama_driver ?? 'Driver ' + (i + 1);
-            return {
-                label: nama,
-                data: driver.map(d => d.total_pendapatan ?? 0),
-                borderColor: warna[i % warna.length],
-                backgroundColor: warna[i % warna.length] + '33',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.3
-            };
-        });
-
-        const tahunLabels = [...new Set(Object.values(dataTahunan).flatMap(d => d.map(x => x.tahun)))];
-
-        new Chart(ctxTahunan, {
-            type: "bar",
-            data: { labels: tahunLabels, datasets: datasetsTahunan },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: "bottom" },
-                    title: { display: true, text: "Pendapatan Tahunan per Driver" }
                 },
                 scales: {
-                    y: {
+                    yPendapatan: {
+                        type: 'linear',
+                        position: 'left',
                         beginAtZero: true,
-                        ticks: { callback: v => 'Rp ' + v.toLocaleString('id-ID') }
+                        ticks: { callback: v => 'Rp ' + v.toLocaleString('id-ID') },
+                        grid: { color: '#f3f4f6' }
+                    },
+                    yCup: {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        ticks: { callback: v => v + ' cup' },
+                        grid: { drawOnChartArea: false }
                     }
                 }
             }
