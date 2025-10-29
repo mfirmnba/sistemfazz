@@ -251,6 +251,45 @@ class DashboardController extends Controller
                 ->orderBy('tanggal')
                 ->get();
 
+            // =============================================================
+            // 🔹 Grafik Bulanan: Pendapatan & Cup Terjual per Driver
+            // =============================================================
+            $grafikBulananDriver = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+                ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
+                ->where('users.role', 'driver')
+                ->where('laporan_penjualans.status', 'terjual')
+                ->selectRaw('
+                    users.id as user_id,
+                    users.name as nama_driver,
+                    MONTH(laporan_penjualans.tanggal) as bulan,
+                    SUM(laporan_penjualans.jumlah) as total_cup,
+                    SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan
+                ')
+                ->groupBy('users.id', 'users.name', 'bulan')
+                ->orderBy('bulan')
+                ->get()
+                ->groupBy('user_id');
+
+            // =============================================================
+            // 🔹 Grafik Tahunan: Pendapatan & Cup Terjual per Driver
+            // =============================================================
+            $grafikTahunanDriver = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+                ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
+                ->where('users.role', 'driver')
+                ->where('laporan_penjualans.status', 'terjual')
+                ->selectRaw('
+                    users.id as user_id,
+                    users.name as nama_driver,
+                    YEAR(laporan_penjualans.tanggal) as tahun,
+                    SUM(laporan_penjualans.jumlah) as total_cup,
+                    SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan
+                ')
+                ->groupBy('users.id', 'users.name', 'tahun')
+                ->orderBy('tahun')
+                ->get()
+                ->groupBy('user_id');
+
+
         return view('owner.dashboard', compact(
             'minumans',
             'stocks',
@@ -280,7 +319,9 @@ class DashboardController extends Controller
             'minumanTerjualPerDriverToday',
             'pendapatanSemuaDriverHarian',
             'minumanTerjualPerHari',
-             'stokMingguan'
+            'grafikBulananDriver',
+            'grafikTahunanDriver',
+            'stokMingguan'
         ));
 
         }
