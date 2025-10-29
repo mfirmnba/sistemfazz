@@ -64,30 +64,30 @@
         </div>
     </div>
 
-        <!-- Statistik Ringkas urutan nomor 2 -->
+        <!-- Statistik Ringkas urutan nomor 1 -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white p-4 shadow rounded-lg">
-            <p class="text-gray-500">Profit</p>
+            <p class="text-gray-500">Pendapatan Hari Ini</p>
             <h2 class="text-2xl font-bold">
                 Rp{{ number_format($totalPendapatanHariIni  ?? 0, 0, ",", ".") }}
             </h2>
             <a href="#" class="text-blue-500 text-sm">View data →</a>
         </div>
         <div class="bg-white p-4 shadow rounded-lg">
-            <p class="text-gray-500">Omset</p>
+            <p class="text-gray-500">Cup Terjual Hari Ini</p>
             <h2 class="text-2xl font-bold">
-                Rp{{ number_format($totalCupTerjual ?? 0, 0, ",", ".") }}
+                {{ $totalCupTerjual ?? 0 }} cup
             </h2>
             <a href="#" class="text-blue-500 text-sm">View data →</a>
         </div>
 
         <div class="bg-white p-4 shadow rounded-lg">
-            <p class="text-gray-500">Minuman Terjual</p>
+            <p class="text-gray-500">Expired Hari Ini</p>
             <h2 class="text-2xl font-bold">{{ $totalExpired ?? 0 }}</h2>
             <a href="#" class="text-blue-500 text-sm">View data →</a>
         </div>
         <div class="bg-white p-4 shadow rounded-lg">
-            <p class="text-gray-500">Stock Tersedia</p>
+            <p class="text-gray-500">Tumpah Hari Ini</p>
             <h2 class="text-2xl font-bold">{{ $totalTumpah ?? 0 }}</h2>
             <a href="#" class="text-blue-500 text-sm">View data →</a>
         </div>
