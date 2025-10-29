@@ -20,133 +20,161 @@ class DashboardController extends Controller
     {
         $today = now()->toDateString();
 
-        // Ambil semua minuman
+        // =============================================================
+        // 🔹 Data Dasar
+        // =============================================================
         $minumans = Minuman::orderBy('nama')->get();
-        
-        // Hitung keuntungan & margin per minuman
         $minumans->map(function ($m) {
             $m->keuntungan_per_cup = $m->harga - ($m->hpp ?? 0);
             $m->margin_persen = $m->hpp > 0 ? round(($m->keuntungan_per_cup / $m->hpp) * 100, 2) : 0;
             return $m;
         });
 
-        // 🔹 Hitung total keuntungan keseluruhan (semua minuman terjual)
         $totalKeuntunganSemua = LaporanPenjualan::with('minuman')
             ->where('status', 'terjual')
             ->get()
-            ->sum(function ($item) {
-                $hpp = $item->minuman->hpp ?? 0;
-                $harga = $item->minuman->harga ?? 0;
-                return ($harga - $hpp) * ($item->jumlah ?? 0);
-            });
+            ->sum(fn($item) => (($item->minuman->harga ?? 0) - ($item->minuman->hpp ?? 0)) * ($item->jumlah ?? 0));
 
-        // Ambil semua stock + total terpakai
-        $stocks = Stock::withSum(['laporanProduksi as terpakai_hari_ini' => function($query) use ($today) {
-            $query->whereDate('tanggal', $today);
+        $stocks = Stock::withSum(['laporanProduksi as terpakai_hari_ini' => function($q) use ($today) {
+            $q->whereDate('tanggal', $today);
         }], 'jumlah_digunakan')
         ->withSum('laporanProduksi as terpakai_total', 'jumlah_digunakan')
         ->orderBy('nama_bahan')
         ->get();
 
-        // User berdasarkan role
         $adminUsers = User::where('role', 'admin')->get();
         $driverUsers = User::where('role', 'driver')->get();
         $produksiUsers = User::where('role', 'produksi')->get();
 
-        // Laporan produksi hari ini
+        // =============================================================
+        // 🔹 Laporan Hari Ini
+        // =============================================================
         $laporanToday = LaporanProduksi::with(['stock', 'user'])
             ->whereDate('tanggal', $today)
             ->get();
-
         $bahanTerpakaiHariIni = $laporanToday->sum('jumlah_digunakan');
 
-        // Laporan penjualan hari ini
         $laporanPenjualanToday = LaporanPenjualan::with('minuman')
             ->whereDate('tanggal', $today)
             ->get();
 
-        // 🔹 Total pendapatan hari ini
-        $totalPendapatanHariIni = $laporanPenjualanToday->where('status', 'terjual')->sum(function ($item) {
-            return ($item->jumlah ?? 0) * ($item->minuman->harga ?? 0);
-        });
+        $totalPendapatanHariIni = $laporanPenjualanToday->where('status', 'terjual')
+            ->sum(fn($item) => ($item->jumlah ?? 0) * ($item->minuman->harga ?? 0));
 
-        // 🔹 Total pendapatan semua waktu
         $totalPendapatan = LaporanPenjualan::with('minuman')
             ->where('status', 'terjual')
             ->get()
-            ->sum(function ($item) {
-                return ($item->jumlah ?? 0) * ($item->minuman->harga ?? 0);
-            });
+            ->sum(fn($item) => ($item->jumlah ?? 0) * ($item->minuman->harga ?? 0));
 
-        // Cup terjual, expired, tumpah (hari ini)
         $totalCupTerjual = $laporanPenjualanToday->where('status', 'terjual')->sum('jumlah');
         $totalExpired = $laporanPenjualanToday->where('status', 'expired')->sum('jumlah');
         $totalTumpah = $laporanPenjualanToday->where('status', 'tumpah')->sum('jumlah');
-
-        // Total stok
         $totalStock = $stocks->sum('jumlah');
-
-        // Total cup terjual keseluruhan
         $totalOrdersAllTime = LaporanPenjualan::where('status', 'terjual')->sum('jumlah');
 
-        // Penjualan per minuman (hari ini)
-        $laporanPenjualanGrouped = $laporanPenjualanToday
+        // =============================================================
+        // 🔹 Grafik Bulanan Penjualan vs Profit
+        // =============================================================
+        $monthlyData = LaporanPenjualan::with('minuman')
             ->where('status', 'terjual')
-            ->groupBy(fn($item) => $item->minuman->nama ?? 'Tanpa Nama')
-            ->map(fn($items) => $items->sum('jumlah'));
+            ->get()
+            ->groupBy(fn($i) => \Carbon\Carbon::parse($i->tanggal)->format('m'))
+            ->map(function ($items) {
+                $penjualan = $items->sum(fn($i) => ($i->jumlah ?? 0) * ($i->minuman->harga ?? 0));
+                $profit = $items->sum(fn($i) => (($i->minuman->harga ?? 0) - ($i->minuman->hpp ?? 0)) * ($i->jumlah ?? 0));
+                return ['penjualan' => $penjualan, 'profit' => $profit];
+            });
 
-        // Penjualan per user total
-        $penjualanPerUserAllTime = LaporanPenjualan::with('user')
-            ->join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+        $bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $penjualanData = [];
+        $profitData = [];
+        foreach (range(1, 12) as $b) {
+            $key = str_pad($b, 2, '0', STR_PAD_LEFT);
+            $penjualanData[] = $monthlyData[$key]['penjualan'] ?? 0;
+            $profitData[] = $monthlyData[$key]['profit'] ?? 0;
+        }
+        $totalKeuntunganBulanan = $profitData;
+
+        // =============================================================
+        // 🔹 Penjualan Per User
+        // =============================================================
+        $penjualanPerUserAllTime = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
             ->where('laporan_penjualans.status', 'terjual')
             ->selectRaw('laporan_penjualans.user_id, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as pendapatan')
             ->groupBy('laporan_penjualans.user_id')
             ->get();
 
-        // Penjualan per user hari ini
-        $penjualanPerUserToday = LaporanPenjualan::with('user')
-            ->join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+        $penjualanPerUserToday = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
             ->whereDate('laporan_penjualans.tanggal', $today)
             ->where('laporan_penjualans.status', 'terjual')
             ->selectRaw('laporan_penjualans.user_id, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as pendapatan')
             ->groupBy('laporan_penjualans.user_id')
             ->get();
 
-        // 🔹 Data bulanan untuk grafik Penjualan vs Profit
-        $monthlyData = LaporanPenjualan::with('minuman')
-            ->where('status', 'terjual')
-            ->get()
-            ->groupBy(fn($item) => \Carbon\Carbon::parse($item->tanggal)->format('m'))
-            ->map(function ($items) {
-                $totalPenjualan = $items->sum(function ($i) {
-                    return ($i->jumlah ?? 0) * ($i->minuman->harga ?? 0);
-                });
-                $totalProfit = $items->sum(function ($i) {
-                    $hpp = $i->minuman->hpp ?? 0;
-                    $harga = $i->minuman->harga ?? 0;
-                    return ($harga - $hpp) * ($i->jumlah ?? 0);
-                });
-                return [
-                    'penjualan' => $totalPenjualan,
-                    'profit' => $totalProfit,
-                ];
-            });
+        // =============================================================
+        // 🔹 Grafik Pendapatan Harian Per Driver (Gabungan History)
+        // =============================================================
+        $pendapatanDriverHarian = [];
+        $dataAktif = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+            ->select('laporan_penjualans.user_id', DB::raw('DATE(laporan_penjualans.tanggal) as tanggal'), DB::raw('SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan'))
+            ->groupBy('laporan_penjualans.user_id', 'tanggal')
+            ->get();
 
-        // Pastikan semua bulan (1–12) ada
-        $bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $dataHistory = LaporanPenjualanHistory::join('minumans', 'laporan_penjualan_histories.minuman_id', '=', 'minumans.id')
+            ->select('laporan_penjualan_histories.user_id', DB::raw('DATE(laporan_penjualan_histories.tanggal) as tanggal'), DB::raw('SUM(laporan_penjualan_histories.jumlah * minumans.harga) as total_pendapatan'))
+            ->groupBy('laporan_penjualan_histories.user_id', 'tanggal')
+            ->get();
 
-        $penjualanData = [];
-        $profitData = [];
-        foreach (range(1, 12) as $bulan) {
-            $key = str_pad($bulan, 2, '0', STR_PAD_LEFT);
-            $penjualanData[] = $monthlyData[$key]['penjualan'] ?? 0;
-            $profitData[] = $monthlyData[$key]['profit'] ?? 0;
+        $gabung = $dataAktif->concat($dataHistory);
+        foreach ($gabung as $row) {
+            $driver = User::find($row->user_id);
+            if (!$driver) continue;
+            $nama = $driver->name ?? 'Tanpa Nama';
+            $pendapatanDriverHarian[$nama][] = [
+                'tanggal' => $row->tanggal,
+                'total_pendapatan' => (float) $row->total_pendapatan,
+            ];
         }
 
-        // ✅ tambahan untuk Blade biar nggak error
-        $totalKeuntunganBulanan = $profitData;
+        // =============================================================
+        // 🔹 Grafik Stok Mingguan
+        // =============================================================
+        $stokMingguan = LaporanProduksi::selectRaw('DATE(tanggal) as tanggal, SUM(jumlah_digunakan) as total_stok')
+            ->whereBetween('tanggal', [now()->subDays(6), now()])
+            ->groupBy('tanggal')
+            ->orderBy('tanggal')
+            ->get();
 
-        // 🔹 Penjualan semua minuman (all time, tidak di-limit)
+        // =============================================================
+        // 🔹 Grafik Bulanan & Tahunan Per Driver
+        // =============================================================
+        $grafikBulananDriver = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+            ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
+            ->where('users.role', 'driver')
+            ->where('laporan_penjualans.status', 'terjual')
+            ->selectRaw('users.id as user_id, users.name as nama_driver, MONTH(laporan_penjualans.tanggal) as bulan, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
+            ->groupBy('users.id', 'users.name', 'bulan')
+            ->orderBy('bulan')
+            ->get()
+            ->groupBy('user_id');
+
+        $grafikTahunanDriver = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+            ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
+            ->where('users.role', 'driver')
+            ->where('laporan_penjualans.status', 'terjual')
+            ->selectRaw('users.id as user_id, users.name as nama_driver, YEAR(laporan_penjualans.tanggal) as tahun, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
+            ->groupBy('users.id', 'users.name', 'tahun')
+            ->orderBy('tahun')
+            ->get()
+            ->groupBy('user_id');
+
+        // =============================================================
+        // 🔹 Data Lain-lain
+        // =============================================================
+        $laporanPenjualanGrouped = $laporanPenjualanToday->where('status', 'terjual')
+            ->groupBy(fn($i) => $i->minuman->nama ?? 'Tanpa Nama')
+            ->map(fn($i) => $i->sum('jumlah'));
+
         $penjualanMinuman = LaporanPenjualan::with('minuman')
             ->where('status', 'terjual')
             ->selectRaw('minuman_id, SUM(jumlah) as total_qty')
@@ -154,23 +182,6 @@ class DashboardController extends Controller
             ->orderByDesc('total_qty')
             ->get();
 
-            // =============================================================
-        // 🔹 Pendapatan Harian Per Driver (Grafik per Hari)
-        // =============================================================
-        $pendapatanDriverHarian = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
-            ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
-            ->where('users.role', 'driver')
-            ->where('laporan_penjualans.status', 'terjual')
-            ->selectRaw('DATE(laporan_penjualans.tanggal) as tanggal, users.id as user_id, users.name as nama_driver, SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
-            ->groupBy('tanggal', 'users.id', 'users.name')
-            ->orderBy('tanggal')
-            ->get()
-            ->groupBy('user_id');
-
-
-        // =============================================================
-        // 🔹 Daftar Minuman Terjual per Driver (Hari Ini)
-        // =============================================================
         $minumanTerjualPerDriverToday = LaporanPenjualan::with('user', 'minuman')
             ->whereDate('tanggal', $today)
             ->where('status', 'terjual')
@@ -179,24 +190,17 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('user_id');
 
-        // =============================================================
-        // 🔹 Pendapatan Harian Semua Driver (Total Harian, untuk Grafik Owner)
-        // =============================================================
-        $pendapatanSemuaDriverHarian = LaporanPenjualan::with('minuman')
-            ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
+        $pendapatanSemuaDriverHarian = LaporanPenjualan::join('users', 'laporan_penjualans.user_id', '=', 'users.id')
+            ->join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
             ->where('users.role', 'driver')
             ->where('laporan_penjualans.status', 'terjual')
             ->selectRaw('DATE(laporan_penjualans.tanggal) as tanggal, SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
-            ->join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
             ->groupBy('tanggal')
             ->orderBy('tanggal')
             ->get();
 
-        // =============================================================
-        // 🔹 Total Minuman Terjual Per Hari (Semua Driver)
-        // =============================================================
-        $minumanTerjualPerHari = LaporanPenjualan::with('minuman')
-            ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
+        $minumanTerjualPerHari = LaporanPenjualan::join('users', 'laporan_penjualans.user_id', '=', 'users.id')
+            ->join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
             ->where('users.role', 'driver')
             ->where('laporan_penjualans.status', 'terjual')
             ->selectRaw('DATE(laporan_penjualans.tanggal) as tanggal, minuman_id, SUM(jumlah) as total_terjual')
@@ -205,124 +209,20 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('tanggal');
 
-            // ======================
-            // Pendapatan harian per driver
-            // ======================
-            $pendapatanDriverHarian = [];
-
-            // Gabungkan dari tabel aktif + history
-            $dataAktif = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
-                ->select(
-                    'laporan_penjualans.user_id',
-                    DB::raw('DATE(laporan_penjualans.tanggal) as tanggal'),
-                    DB::raw('SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
-                )
-                ->groupBy('laporan_penjualans.user_id', 'tanggal')
-                ->get();
-
-            $dataHistory = LaporanPenjualanHistory::join('minumans', 'laporan_penjualan_histories.minuman_id', '=', 'minumans.id')
-                ->select(
-                    'laporan_penjualan_histories.user_id',
-                    DB::raw('DATE(laporan_penjualan_histories.tanggal) as tanggal'),
-                    DB::raw('SUM(laporan_penjualan_histories.jumlah * minumans.harga) as total_pendapatan')
-                )
-                ->groupBy('laporan_penjualan_histories.user_id', 'tanggal')
-                ->get();
-
-            $gabung = $dataAktif->concat($dataHistory);
-
-            // Kelompokkan per driver
-            foreach ($gabung as $row) {
-                $driver = User::find($row->user_id);
-                if (!$driver) continue;
-
-                $nama = $driver->name ?? 'Tanpa Nama';
-                $pendapatanDriverHarian[$nama][] = [
-                    'tanggal' => $row->tanggal,
-                    'total_pendapatan' => (float) $row->total_pendapatan,
-                ];
-            }
-            // =============================================================
-            // 🔹 Stok Mingguan (Grafik total stok bahan selama 7 hari terakhir)
-            // =============================================================
-            $stokMingguan = LaporanProduksi::selectRaw('DATE(tanggal) as tanggal, SUM(jumlah_digunakan) as total_stok')
-                ->whereBetween('tanggal', [now()->subDays(6), now()])
-                ->groupBy('tanggal')
-                ->orderBy('tanggal')
-                ->get();
-
-            // =============================================================
-            // 🔹 Grafik Bulanan: Pendapatan & Cup Terjual per Driver
-            // =============================================================
-            $grafikBulananDriver = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
-                ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
-                ->where('users.role', 'driver')
-                ->where('laporan_penjualans.status', 'terjual')
-                ->selectRaw('
-                    users.id as user_id,
-                    users.name as nama_driver,
-                    MONTH(laporan_penjualans.tanggal) as bulan,
-                    SUM(laporan_penjualans.jumlah) as total_cup,
-                    SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan
-                ')
-                ->groupBy('users.id', 'users.name', 'bulan')
-                ->orderBy('bulan')
-                ->get()
-                ->groupBy('user_id');
-
-            // =============================================================
-            // 🔹 Grafik Tahunan: Pendapatan & Cup Terjual per Driver
-            // =============================================================
-            $grafikTahunanDriver = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
-                ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
-                ->where('users.role', 'driver')
-                ->where('laporan_penjualans.status', 'terjual')
-                ->selectRaw('
-                    users.id as user_id,
-                    users.name as nama_driver,
-                    YEAR(laporan_penjualans.tanggal) as tahun,
-                    SUM(laporan_penjualans.jumlah) as total_cup,
-                    SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan
-                ')
-                ->groupBy('users.id', 'users.name', 'tahun')
-                ->orderBy('tahun')
-                ->get()
-                ->groupBy('user_id');
-
-
+        // =============================================================
+        // 🔹 RETURN
+        // =============================================================
         return view('owner.dashboard', compact(
-            'minumans',
-            'stocks',
-            'adminUsers',
-            'driverUsers',
-            'produksiUsers',
-            'laporanToday',
-            'laporanPenjualanToday',
-            'bahanTerpakaiHariIni',
-            'totalPendapatan',
-            'totalPendapatanHariIni',
-            'totalKeuntunganSemua',
-            'totalCupTerjual',
-            'totalOrdersAllTime',
-            'totalExpired',
-            'totalTumpah',
-            'totalStock',
-            'laporanPenjualanGrouped',
-            'penjualanPerUserToday',
-            'penjualanPerUserAllTime',
-            'bulanLabels',
-            'penjualanData',
-            'profitData',
-            'totalKeuntunganBulanan',
-            'penjualanMinuman',
-            'pendapatanDriverHarian', 
-            'minumanTerjualPerDriverToday',
-            'pendapatanSemuaDriverHarian',
-            'minumanTerjualPerHari',
-            'grafikBulananDriver',
-            'grafikTahunanDriver',
+            'minumans', 'stocks', 'adminUsers', 'driverUsers', 'produksiUsers',
+            'laporanToday', 'laporanPenjualanToday', 'bahanTerpakaiHariIni',
+            'totalPendapatan', 'totalPendapatanHariIni', 'totalKeuntunganSemua',
+            'totalCupTerjual', 'totalOrdersAllTime', 'totalExpired', 'totalTumpah',
+            'totalStock', 'laporanPenjualanGrouped', 'penjualanPerUserToday',
+            'penjualanPerUserAllTime', 'bulanLabels', 'penjualanData', 'profitData',
+            'totalKeuntunganBulanan', 'penjualanMinuman', 'pendapatanDriverHarian',
+            'minumanTerjualPerDriverToday', 'pendapatanSemuaDriverHarian',
+            'minumanTerjualPerHari', 'grafikBulananDriver', 'grafikTahunanDriver',
             'stokMingguan'
         ));
-
-        }
     }
+}
