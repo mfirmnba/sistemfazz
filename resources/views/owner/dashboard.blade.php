@@ -1086,6 +1086,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
+    <!-- ========================= -->
+    <!-- 8. Grafik Bulanan per Driver (Pendapatan & Cup) -->
+    <!-- ========================= -->
     const bulananEl = document.getElementById("chartBulananDriver");
     if (bulananEl) {
         const ctxBulanan = bulananEl.getContext("2d");
