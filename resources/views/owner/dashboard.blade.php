@@ -110,29 +110,15 @@
             <div class="h-[400px] w-full flex items-center justify-center">
                 <canvas id="chartBulananDriver" class="w-full h-full"></canvas>
             </div>
-            <!-- 📈 Grafik Tahunan -->
-        <div class="flex-1 bg-white dark:bg-gray-800 p-6 shadow rounded-xl hover:shadow-lg transition duration-300">
-            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 text-center">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 text-center">
                 📈 Grafik Tahunan Pendapatan & Cup Terjual per Driver
-            </h2>
+            </h3>
             <div class="h-[400px] w-full flex items-center justify-center">
                 <canvas id="chartTahunanDriver" class="w-full h-full"></canvas>
             </div>
+            
         </div>
     </div>
-        </div>
-
-        <!-- 📈 Grafik Tahunan -->
-        <div class="flex-1 bg-white dark:bg-gray-800 p-6 shadow rounded-xl hover:shadow-lg transition duration-300">
-            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 text-center">
-                📈 Grafik Tahunan Pendapatan & Cup Terjual per Driver
-            </h2>
-            <div class="h-[400px] w-full flex items-center justify-center">
-                <canvas id="chartTahunanDriver" class="w-full h-full"></canvas>
-            </div>
-        </div>
-    </div>
-
 
         <!-- 🥤 Minuman Terjual Hari Ini per Driver urutan nomor 3 -->
     <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
