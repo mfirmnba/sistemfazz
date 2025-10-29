@@ -64,7 +64,7 @@
         </div>
     </div>
 
-        <!-- Statistik Ringkas urutan nomor 1 -->
+        <!-- Statistik Ringkas urutan nomor 2 -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white p-4 shadow rounded-lg">
             <p class="text-gray-500">Pendapatan Hari Ini</p>
@@ -92,34 +92,6 @@
             <a href="#" class="text-blue-500 text-sm">View data →</a>
         </div>
     </div>
-    
-    <!-- ============================= -->
-    <!-- 📊 Grafik Driver: Bulanan & Tahunan (Side-by-Side) -->
-    <!-- ============================= -->
-    <div class="w-full flex flex-row justify-between items-stretch gap-6 mt-8 mb-10 overflow-x-auto">
-
-        <!-- 📊 Grafik Bulanan -->
-        <div class="w-1/2 min-w-[600px] bg-white dark:bg-gray-800 p-6 shadow rounded-xl hover:shadow-lg transition duration-300">
-            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 text-center">
-                📊 Grafik Bulanan Pendapatan & Cup Terjual per Driver
-            </h2>
-            <div class="h-[400px] w-full flex items-center justify-center">
-                <canvas id="chartBulananDriver" class="w-full h-full"></canvas>
-            </div>
-        </div>
-
-        <!-- 📈 Grafik Tahunan -->
-        <div class="w-1/2 min-w-[600px] bg-white dark:bg-gray-800 p-6 shadow rounded-xl hover:shadow-lg transition duration-300">
-            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 text-center">
-                📈 Grafik Tahunan Pendapatan & Cup Terjual per Driver
-            </h2>
-            <div class="h-[400px] w-full flex items-center justify-center">
-                <canvas id="chartTahunanDriver" class="w-full h-full"></canvas>
-            </div>
-        </div>
-
-    </div>
-
 
         <!-- 🥤 Minuman Terjual Hari Ini per Driver urutan nomor 3 -->
     <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
@@ -277,6 +249,33 @@
             </table>
         </div>
         @endif
+    </div>
+
+        <!-- ============================= -->
+    <!-- 📊 Grafik Driver: Bulanan & Tahunan (Side-by-Side) -->
+    <!-- ============================= -->
+    <div class="w-full flex flex-row justify-between items-stretch gap-6 mt-8 mb-10 overflow-x-auto">
+
+        <!-- 📊 Grafik Bulanan -->
+        <div class="w-1/2 min-w-[600px] bg-white dark:bg-gray-800 p-6 shadow rounded-xl hover:shadow-lg transition duration-300">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 text-center">
+                📊 Grafik Bulanan Pendapatan & Cup Terjual per Driver
+            </h2>
+            <div class="h-[400px] w-full flex items-center justify-center">
+                <canvas id="chartBulananDriver" class="w-full h-full"></canvas>
+            </div>
+        </div>
+
+        <!-- 📈 Grafik Tahunan -->
+        <div class="w-1/2 min-w-[600px] bg-white dark:bg-gray-800 p-6 shadow rounded-xl hover:shadow-lg transition duration-300">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 text-center">
+                📈 Grafik Tahunan Pendapatan & Cup Terjual per Driver
+            </h2>
+            <div class="h-[400px] w-full flex items-center justify-center">
+                <canvas id="chartTahunanDriver" class="w-full h-full"></canvas>
+            </div>
+        </div>
+
     </div>
 
     <!-- Data User -->
