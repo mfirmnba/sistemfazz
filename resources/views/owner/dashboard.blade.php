@@ -64,38 +64,47 @@
         </div>
     </div>
 
-        <!-- Statistik Ringkas Warna urutan nomor 2 -->
+    <!-- Statistik Ringkas (Desain Baru Putih - Versi Modern) -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 mt-6">
-        <div
-            class="bg-green-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
-        >
-            <h2 class="text-lg font-semibold">Pendapatan Hari Ini</h2>
-            <p class="text-2xl font-bold mt-2">
-                Rp
-                {{ number_format($totalPendapatanHariIni ?? 0, 0, ",", ".") }}
-            </p>
+
+        <!-- 💰 Pendapatan Hari Ini -->
+        <div class="bg-white p-5 shadow rounded-lg hover:shadow-md transition">
+            <p class="text-gray-500">Pendapatan Hari Ini</p>
+            <h2 class="text-2xl font-bold text-gray-800 mt-2">
+                Rp{{ number_format($totalPendapatanHariIni ?? 0, 0, ",", ".") }}
+            </h2>
+            <a href="#" class="text-blue-500 text-sm mt-1 inline-block">Lihat detail →</a>
         </div>
-        <div
-            class="bg-purple-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
-        >
-            <h2 class="text-lg font-semibold">Cup Terjual Hari Ini</h2>
-            <p class="text-2xl font-bold mt-2">
+
+        <!-- 🧃 Cup Terjual Hari Ini -->
+        <div class="bg-white p-5 shadow rounded-lg hover:shadow-md transition">
+            <p class="text-gray-500">Cup Terjual Hari Ini</p>
+            <h2 class="text-2xl font-bold text-gray-800 mt-2">
                 {{ $totalCupTerjual ?? 0 }} cup
-            </p>
+            </h2>
+            <a href="#" class="text-blue-500 text-sm mt-1 inline-block">Lihat detail →</a>
         </div>
-        <div
-            class="bg-yellow-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
-        >
-            <h2 class="text-lg font-semibold">Expired Hari Ini</h2>
-            <p class="text-2xl font-bold mt-2">{{ $totalExpired ?? 0 }} cup</p>
+
+        <!-- ⚠️ Expired Hari Ini -->
+        <div class="bg-white p-5 shadow rounded-lg hover:shadow-md transition">
+            <p class="text-gray-500">Expired Hari Ini</p>
+            <h2 class="text-2xl font-bold text-gray-800 mt-2">
+                {{ $totalExpired ?? 0 }} cup
+            </h2>
+            <a href="#" class="text-blue-500 text-sm mt-1 inline-block">Lihat detail →</a>
         </div>
-        <div
-            class="bg-red-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
-        >
-            <h2 class="text-lg font-semibold">Tumpah Hari Ini</h2>
-            <p class="text-2xl font-bold mt-2">{{ $totalTumpah ?? 0 }} cup</p>
+
+        <!-- 💦 Tumpah Hari Ini -->
+        <div class="bg-white p-5 shadow rounded-lg hover:shadow-md transition">
+            <p class="text-gray-500">Tumpah Hari Ini</p>
+            <h2 class="text-2xl font-bold text-gray-800 mt-2">
+                {{ $totalTumpah ?? 0 }} cup
+            </h2>
+            <a href="#" class="text-blue-500 text-sm mt-1 inline-block">Lihat detail →</a>
         </div>
-    </div> 
+
+    </div>
+
     
     <!-- ============================= -->
     <!-- 📊 Grafik Driver: Bulanan & Tahunan (Side-by-Side) -->
