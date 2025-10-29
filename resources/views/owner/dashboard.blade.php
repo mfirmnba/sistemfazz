@@ -1086,9 +1086,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
-<!-- ========================= -->
-<!-- 8. Grafik Bulanan per Driver (Pendapatan & Cup) -->
-<!-- ========================= -->
 document.addEventListener("DOMContentLoaded", function () {
     const bulananCanvas = document.getElementById("chartBulananDriver");
     if (!bulananCanvas) return; // pastikan elemen ada
@@ -1187,6 +1184,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
+});
 });
 </script>
 
