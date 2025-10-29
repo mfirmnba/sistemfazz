@@ -1086,8 +1086,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
-    document.addEventListener("DOMContentLoaded", function () {
-    // =========================
+// =========================
     // 8. Grafik Bulanan per Driver (Cup & Pendapatan)
     // =========================
     const bulananEl = document.getElementById("chartBulananDriver");
@@ -1096,14 +1095,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const dataBulanan = @json($grafikBulananDriver);
         const warna = ['#36A2EB','#FF6384','#4BC0C0','#FFCE56','#9966FF','#FF9F40'];
         const bulanLabels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-
         const datasetsBulanan = [];
 
         Object.values(dataBulanan).forEach((driver, i) => {
             const nama = driver[0]?.nama_driver ?? 'Driver ' + (i + 1);
             const dataCup = Array(12).fill(0);
             const dataPendapatan = Array(12).fill(0);
-
             driver.forEach(d => {
                 const idx = parseInt(d.bulan) - 1;
                 if (idx >= 0 && idx < 12) {
@@ -1112,19 +1109,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            // Dataset untuk Cup
             datasetsBulanan.push({
                 label: `${nama} - Cup`,
                 data: dataCup,
                 borderColor: warna[i % warna.length],
                 backgroundColor: warna[i % warna.length] + '33',
                 borderWidth: 2,
-                fill: false,
                 tension: 0.3,
+                fill: false,
                 yAxisID: 'yCup'
             });
-
-            // Dataset untuk Pendapatan
             datasetsBulanan.push({
                 label: `${nama} - Pendapatan`,
                 data: dataPendapatan,
@@ -1132,8 +1126,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 backgroundColor: warna[i % warna.length] + '22',
                 borderDash: [5, 5],
                 borderWidth: 2,
-                fill: false,
                 tension: 0.3,
+                fill: false,
                 yAxisID: 'yPendapatan'
             });
         });
@@ -1161,24 +1155,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 scales: {
                     yCup: {
                         type: 'linear',
-                        display: true,
                         position: 'left',
                         beginAtZero: true,
-                        ticks: {
-                            color: "#ef4444",
-                            callback: v => v + " Cup"
-                        },
-                        grid: { color: "#f3f4f6" }
+                        ticks: { color: "#ef4444", callback: v => v + " Cup" }
                     },
                     yPendapatan: {
                         type: 'linear',
-                        display: true,
                         position: 'right',
                         beginAtZero: true,
-                        ticks: {
-                            color: "#2563eb",
-                            callback: v => "Rp " + v.toLocaleString("id-ID")
-                        },
+                        ticks: { color: "#2563eb", callback: v => "Rp " + v.toLocaleString("id-ID") },
                         grid: { drawOnChartArea: false }
                     }
                 }
@@ -1186,102 +1171,87 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-        // =========================
-        // 9. Grafik Tahunan per Driver (Cup & Pendapatan)
-        // =========================
-        const tahunanEl = document.getElementById("chartTahunanDriver");
-        if (tahunanEl) {
-            const ctxTahunan = tahunanEl.getContext("2d");
-            const dataTahunan = @json($grafikTahunanDriver);
-            const warna = ['#36A2EB','#FF6384','#4BC0C0','#FFCE56','#9966FF','#FF9F40'];
+    // =========================
+    // 9. Grafik Tahunan per Driver (Cup & Pendapatan)
+    // =========================
+    const tahunanEl = document.getElementById("chartTahunanDriver");
+    if (tahunanEl) {
+        const ctxTahunan = tahunanEl.getContext("2d");
+        const dataTahunan = @json($grafikTahunanDriver);
+        const warna = ['#36A2EB','#FF6384','#4BC0C0','#FFCE56','#9966FF','#FF9F40'];
+        const tahunLabels = [...new Set(Object.values(dataTahunan).flatMap(d => d.map(x => x.tahun)))];
+        const datasetsTahunan = [];
 
-            const tahunLabels = [...new Set(Object.values(dataTahunan).flatMap(d => d.map(x => x.tahun)))];
-            const datasetsTahunan = [];
-
-            Object.values(dataTahunan).forEach((driver, i) => {
-                const nama = driver[0]?.nama_driver ?? 'Driver ' + (i + 1);
-                const dataCup = tahunLabels.map(t => {
-                    const tahunData = driver.find(d => d.tahun == t);
-                    return tahunData ? tahunData.total_cup ?? 0 : 0;
-                });
-                const dataPendapatan = tahunLabels.map(t => {
-                    const tahunData = driver.find(d => d.tahun == t);
-                    return tahunData ? tahunData.total_pendapatan ?? 0 : 0;
-                });
-
-                // Dataset Cup
-                datasetsTahunan.push({
-                    label: `${nama} - Cup`,
-                    data: dataCup,
-                    backgroundColor: warna[i % warna.length] + '88',
-                    borderColor: warna[i % warna.length],
-                    borderWidth: 1,
-                    yAxisID: 'yCup'
-                });
-
-                // Dataset Pendapatan
-                datasetsTahunan.push({
-                    label: `${nama} - Pendapatan`,
-                    data: dataPendapatan,
-                    backgroundColor: warna[i % warna.length] + '33',
-                    borderColor: warna[i % warna.length],
-                    borderDash: [5, 5],
-                    borderWidth: 2,
-                    type: 'line',
-                    tension: 0.3,
-                    fill: false,
-                    yAxisID: 'yPendapatan'
-                });
+        Object.values(dataTahunan).forEach((driver, i) => {
+            const nama = driver[0]?.nama_driver ?? 'Driver ' + (i + 1);
+            const dataCup = tahunLabels.map(t => {
+                const tahunData = driver.find(d => d.tahun == t);
+                return tahunData ? tahunData.total_cup ?? 0 : 0;
+            });
+            const dataPendapatan = tahunLabels.map(t => {
+                const tahunData = driver.find(d => d.tahun == t);
+                return tahunData ? tahunData.total_pendapatan ?? 0 : 0;
             });
 
-            new Chart(ctxTahunan, {
-                type: "bar",
-                data: { labels: tahunLabels, datasets: datasetsTahunan },
-                options: {
-                    responsive: true,
-                    interaction: { mode: "index", intersect: false },
-                    plugins: {
-                        legend: { position: "bottom" },
-                        title: { display: true, text: "Cup & Pendapatan Tahunan per Driver" },
-                        tooltip: {
-                            callbacks: {
-                                label: function(ctx) {
-                                    if (ctx.dataset.label.includes("Pendapatan")) {
-                                        return "Rp " + ctx.parsed.y.toLocaleString("id-ID");
-                                    }
-                                    return ctx.parsed.y + " Cup";
+            datasetsTahunan.push({
+                label: `${nama} - Cup`,
+                data: dataCup,
+                backgroundColor: warna[i % warna.length] + '88',
+                borderColor: warna[i % warna.length],
+                borderWidth: 1,
+                yAxisID: 'yCup'
+            });
+            datasetsTahunan.push({
+                label: `${nama} - Pendapatan`,
+                data: dataPendapatan,
+                borderColor: warna[i % warna.length],
+                borderDash: [5, 5],
+                borderWidth: 2,
+                type: 'line',
+                tension: 0.3,
+                fill: false,
+                yAxisID: 'yPendapatan'
+            });
+        });
+
+        new Chart(ctxTahunan, {
+            type: "bar",
+            data: { labels: tahunLabels, datasets: datasetsTahunan },
+            options: {
+                responsive: true,
+                interaction: { mode: "index", intersect: false },
+                plugins: {
+                    legend: { position: "bottom" },
+                    title: { display: true, text: "Cup & Pendapatan Tahunan per Driver" },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                if (ctx.dataset.label.includes("Pendapatan")) {
+                                    return "Rp " + ctx.parsed.y.toLocaleString("id-ID");
                                 }
+                                return ctx.parsed.y + " Cup";
                             }
                         }
+                    }
+                },
+                scales: {
+                    yCup: {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        ticks: { color: "#ef4444", callback: v => v + " Cup" }
                     },
-                    scales: {
-                        yCup: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            beginAtZero: true,
-                            ticks: {
-                                color: "#ef4444",
-                                callback: v => v + " Cup"
-                            },
-                            grid: { color: "#f3f4f6" }
-                        },
-                        yPendapatan: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            beginAtZero: true,
-                            ticks: {
-                                color: "#2563eb",
-                                callback: v => "Rp " + v.toLocaleString("id-ID")
-                            },
-                            grid: { drawOnChartArea: false }
-                        }
+                    yPendapatan: {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        ticks: { color: "#2563eb", callback: v => "Rp " + v.toLocaleString("id-ID") },
+                        grid: { drawOnChartArea: false }
                     }
                 }
-            });
-        }
-    });
+            }
+        });
+    }
     });
     
 </script>
