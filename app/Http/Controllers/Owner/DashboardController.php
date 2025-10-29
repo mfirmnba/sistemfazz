@@ -137,36 +137,32 @@ class DashboardController extends Controller
         }
 
         // =============================================================
-        // 🔹 Grafik Stok Mingguan
-        // =============================================================
-        $stokMingguan = LaporanProduksi::selectRaw('DATE(tanggal) as tanggal, SUM(jumlah_digunakan) as total_stok')
-            ->whereBetween('tanggal', [now()->subDays(6), now()])
-            ->groupBy('tanggal')
-            ->orderBy('tanggal')
-            ->get();
-
-        // =============================================================
         // 🔹 Grafik Bulanan & Tahunan Per Driver
         // =============================================================
         $grafikBulananDriver = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
             ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
             ->where('users.role', 'driver')
             ->where('laporan_penjualans.status', 'terjual')
-            ->selectRaw('users.id as user_id, users.name as nama_driver, MONTH(laporan_penjualans.tanggal) as bulan, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
-            ->groupBy('users.id', 'users.name', 'bulan')
+            ->selectRaw('users.name as nama_driver, MONTH(laporan_penjualans.tanggal) as bulan, 
+                        SUM(laporan_penjualans.jumlah) as total_cup, 
+                        SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
+            ->groupBy('users.name', 'bulan')
             ->orderBy('bulan')
             ->get()
-            ->groupBy('user_id');
+            ->groupBy('nama_driver');
 
         $grafikTahunanDriver = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
             ->join('users', 'laporan_penjualans.user_id', '=', 'users.id')
             ->where('users.role', 'driver')
             ->where('laporan_penjualans.status', 'terjual')
-            ->selectRaw('users.id as user_id, users.name as nama_driver, YEAR(laporan_penjualans.tanggal) as tahun, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
-            ->groupBy('users.id', 'users.name', 'tahun')
+            ->selectRaw('users.name as nama_driver, YEAR(laporan_penjualans.tanggal) as tahun, 
+                        SUM(laporan_penjualans.jumlah) as total_cup, 
+                        SUM(laporan_penjualans.jumlah * minumans.harga) as total_pendapatan')
+            ->groupBy('users.name', 'tahun')
             ->orderBy('tahun')
             ->get()
-            ->groupBy('user_id');
+            ->groupBy('nama_driver');
+
 
         // =============================================================
         // 🔹 Data Lain-lain
