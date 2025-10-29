@@ -35,7 +35,7 @@
         </style>
     </div>
 
-    <!-- Statistik Ringkas -->
+    <!-- Statistik Ringkas urutan nomor 1 -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white p-4 shadow rounded-lg">
             <p class="text-gray-500">Profit</p>
@@ -62,6 +62,197 @@
             <h2 class="text-2xl font-bold">{{ $totalStock ?? 0 }}</h2>
             <a href="#" class="text-blue-500 text-sm">View data →</a>
         </div>
+    </div>
+
+        <!-- Statistik Ringkas Warna urutan nomor 2 -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 mt-6">
+        <div
+            class="bg-green-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
+        >
+            <h2 class="text-lg font-semibold">Pendapatan Hari Ini</h2>
+            <p class="text-2xl font-bold mt-2">
+                Rp
+                {{ number_format($totalPendapatanHariIni ?? 0, 0, ",", ".") }}
+            </p>
+        </div>
+        <div
+            class="bg-purple-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
+        >
+            <h2 class="text-lg font-semibold">Cup Terjual Hari Ini</h2>
+            <p class="text-2xl font-bold mt-2">
+                {{ $totalCupTerjual ?? 0 }} cup
+            </p>
+        </div>
+        <div
+            class="bg-yellow-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
+        >
+            <h2 class="text-lg font-semibold">Expired Hari Ini</h2>
+            <p class="text-2xl font-bold mt-2">{{ $totalExpired ?? 0 }} cup</p>
+        </div>
+        <div
+            class="bg-red-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
+        >
+            <h2 class="text-lg font-semibold">Tumpah Hari Ini</h2>
+            <p class="text-2xl font-bold mt-2">{{ $totalTumpah ?? 0 }} cup</p>
+        </div>
+    </div> 
+
+        <!-- 🥤 Minuman Terjual Hari Ini per Driver urutan nomor 3 -->
+    <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
+        <h2 class="text-xl font-semibold mb-4">
+             Minuman Terjual Hari Ini per Rider
+        </h2>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm border border-gray-200 rounded-lg">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr class="text-center font-semibold">
+                        <th class="p-3 border w-12">#</th>
+                        <th class="p-3 border text-left">Nama Driver</th>
+                        <th class="p-3 border text-left">Nama Minuman</th>
+                        <th class="p-3 border text-center">Jumlah Terjual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $no = 1; @endphp @forelse($minumanTerjualPerDriverToday
+                    as $driverId => $items) @foreach($items as $item)
+                    <tr class="hover:bg-gray-50 even:bg-gray-50/50">
+                        <td class="p-3 border text-center">{{ $no++ }}</td>
+                        <td class="p-3 border text-left">
+                            {{ $item->user->name ?? '-' }}
+                        </td>
+                        <td class="p-3 border text-left">
+                            {{ $item->minuman->nama ?? '-' }}
+                        </td>
+                        <td
+                            class="p-3 border text-center font-semibold text-blue-600"
+                        >
+                            {{ $item->total_terjual }}
+                        </td>
+                    </tr>
+                    @endforeach @empty
+                    <tr>
+                        <td
+                            colspan="4"
+                            class="p-4 text-center text-gray-500 italic"
+                        >
+                            Belum ada data penjualan hari ini.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+
+                @if($minumanTerjualPerDriverToday &&
+                collect($minumanTerjualPerDriverToday)->flatten()->count() > 0)
+                <tfoot class="bg-gray-100 text-gray-800 font-bold">
+                    <tr>
+                        <td colspan="3" class="p-3 border text-left">
+                            TOTAL MINUMAN TERJUAL
+                        </td>
+                        <td class="p-3 border text-center text-green-700">
+                            {{ collect($minumanTerjualPerDriverToday)->flatten()->sum('total_terjual') }}
+                        </td>
+                    </tr>
+                </tfoot>
+                @endif
+            </table>
+        </div>
+    </div>
+
+    <!-- Rincian Pendapatan Per User Hari Ini urutan nomor 4 -->
+    <div class="bg-white p-6 rounded-xl shadow mb-10 mt-6">
+        <h2 class="text-lg font-semibold mb-4">
+             Pendapatan Rider (Hari Ini)
+        </h2>
+        @if($penjualanPerUserToday->isEmpty())
+        <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
+            Belum ada data penjualan hari ini.
+        </div>
+        @else
+        <div class="overflow-x-auto">
+            <table
+                class="w-full text-sm text-left border border-gray-200 rounded-lg"
+            >
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="p-2 border">#</th>
+                        <th class="p-2 border">Nama User</th>
+                        <th class="p-2 border">Email</th>
+                        <th class="p-2 border">Total Cup Terjual</th>
+                        <th class="p-2 border">Pendapatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($penjualanPerUserToday as $key => $item)
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-2 border">{{ $key + 1 }}</td>
+                        <td class="p-2 border">
+                            {{ $item->user?->name ?? 'User dihapus' }}
+                        </td>
+                        <td class="p-2 border">
+                            {{ $item->user?->email ?? '-' }}
+                        </td>
+                        <td class="p-2 border font-bold text-green-600">
+                            {{ $item->total_cup }} cup
+                        </td>
+                        <td class="p-2 border font-bold text-blue-600">
+                            Rp
+                            {{ number_format($item->pendapatan ?? 0, 0, ',', '.') }}
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
+    </div>
+
+    <!-- Rincian Pendapatan Per User All Time urutan nomor 5 -->
+    <div class="bg-white p-6 rounded-xl shadow mb-10">
+        <h2 class="text-lg font-semibold mb-4">
+             Pendapatan Rider (All Time)
+        </h2>
+        @if($penjualanPerUserAllTime->isEmpty())
+        <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
+            Belum ada data penjualan.
+        </div>
+        @else
+        <div class="overflow-x-auto">
+            <table
+                class="w-full text-sm text-left border border-gray-200 rounded-lg"
+            >
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="p-2 border">#</th>
+                        <th class="p-2 border">Nama User</th>
+                        <th class="p-2 border">Email</th>
+                        <th class="p-2 border">Total Cup Terjual</th>
+                        <th class="p-2 border">Pendapatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($penjualanPerUserAllTime as $key => $item)
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-2 border">{{ $key + 1 }}</td>
+                        <td class="p-2 border">
+                            {{ $item->user?->name ?? 'User dihapus' }}
+                        </td>
+                        <td class="p-2 border">
+                            {{ $item->user?->email ?? '-' }}
+                        </td>
+                        <td class="p-2 border font-bold text-green-600">
+                            {{ $item->total_cup }} cup
+                        </td>
+                        <td class="p-2 border font-bold text-blue-600">
+                            Rp
+                            {{ number_format($item->pendapatan ?? 0, 0, ',', '.') }}
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
     </div>
 
     <!-- Data User -->
@@ -181,39 +372,6 @@
     .delay-200 { animation-delay: 0.2s; }
     </style>
 
-    <!-- Statistik Ringkas Warna -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 mt-6">
-        <div
-            class="bg-green-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
-        >
-            <h2 class="text-lg font-semibold">Pendapatan Hari Ini</h2>
-            <p class="text-2xl font-bold mt-2">
-                Rp
-                {{ number_format($totalPendapatanHariIni ?? 0, 0, ",", ".") }}
-            </p>
-        </div>
-        <div
-            class="bg-purple-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
-        >
-            <h2 class="text-lg font-semibold">Cup Terjual Hari Ini</h2>
-            <p class="text-2xl font-bold mt-2">
-                {{ $totalCupTerjual ?? 0 }} cup
-            </p>
-        </div>
-        <div
-            class="bg-yellow-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
-        >
-            <h2 class="text-lg font-semibold">Expired Hari Ini</h2>
-            <p class="text-2xl font-bold mt-2">{{ $totalExpired ?? 0 }} cup</p>
-        </div>
-        <div
-            class="bg-red-500 text-white rounded-xl p-6 shadow hover:shadow-lg transition"
-        >
-            <h2 class="text-lg font-semibold">Tumpah Hari Ini</h2>
-            <p class="text-2xl font-bold mt-2">{{ $totalTumpah ?? 0 }} cup</p>
-        </div>
-    </div> 
-
     {{-- ============================= --}}
     <!-- Line Chart: Total Cup Terjual -->
         <div
@@ -240,164 +398,6 @@
                 <span>{{ $totalCupTerjual ?? 0 }} Cup Terjual</span>
             </div>
         </div>
-
-    <!-- 🥤 Minuman Terjual Hari Ini per Driver -->
-    <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
-        <h2 class="text-xl font-semibold mb-4">
-             Minuman Terjual Hari Ini per Rider
-        </h2>
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm border border-gray-200 rounded-lg">
-                <thead class="bg-gray-100 text-gray-700">
-                    <tr class="text-center font-semibold">
-                        <th class="p-3 border w-12">#</th>
-                        <th class="p-3 border text-left">Nama Driver</th>
-                        <th class="p-3 border text-left">Nama Minuman</th>
-                        <th class="p-3 border text-center">Jumlah Terjual</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php $no = 1; @endphp @forelse($minumanTerjualPerDriverToday
-                    as $driverId => $items) @foreach($items as $item)
-                    <tr class="hover:bg-gray-50 even:bg-gray-50/50">
-                        <td class="p-3 border text-center">{{ $no++ }}</td>
-                        <td class="p-3 border text-left">
-                            {{ $item->user->name ?? '-' }}
-                        </td>
-                        <td class="p-3 border text-left">
-                            {{ $item->minuman->nama ?? '-' }}
-                        </td>
-                        <td
-                            class="p-3 border text-center font-semibold text-blue-600"
-                        >
-                            {{ $item->total_terjual }}
-                        </td>
-                    </tr>
-                    @endforeach @empty
-                    <tr>
-                        <td
-                            colspan="4"
-                            class="p-4 text-center text-gray-500 italic"
-                        >
-                            Belum ada data penjualan hari ini.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-
-                @if($minumanTerjualPerDriverToday &&
-                collect($minumanTerjualPerDriverToday)->flatten()->count() > 0)
-                <tfoot class="bg-gray-100 text-gray-800 font-bold">
-                    <tr>
-                        <td colspan="3" class="p-3 border text-left">
-                            TOTAL MINUMAN TERJUAL
-                        </td>
-                        <td class="p-3 border text-center text-green-700">
-                            {{ collect($minumanTerjualPerDriverToday)->flatten()->sum('total_terjual') }}
-                        </td>
-                    </tr>
-                </tfoot>
-                @endif
-            </table>
-        </div>
-    </div>
-
-    <!-- Rincian Pendapatan Per User Hari Ini -->
-    <div class="bg-white p-6 rounded-xl shadow mb-10 mt-6">
-        <h2 class="text-lg font-semibold mb-4">
-             Pendapatan Rider (Hari Ini)
-        </h2>
-        @if($penjualanPerUserToday->isEmpty())
-        <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
-            Belum ada data penjualan hari ini.
-        </div>
-        @else
-        <div class="overflow-x-auto">
-            <table
-                class="w-full text-sm text-left border border-gray-200 rounded-lg"
-            >
-                <thead class="bg-gray-100 text-gray-700">
-                    <tr>
-                        <th class="p-2 border">#</th>
-                        <th class="p-2 border">Nama User</th>
-                        <th class="p-2 border">Email</th>
-                        <th class="p-2 border">Total Cup Terjual</th>
-                        <th class="p-2 border">Pendapatan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($penjualanPerUserToday as $key => $item)
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-2 border">{{ $key + 1 }}</td>
-                        <td class="p-2 border">
-                            {{ $item->user?->name ?? 'User dihapus' }}
-                        </td>
-                        <td class="p-2 border">
-                            {{ $item->user?->email ?? '-' }}
-                        </td>
-                        <td class="p-2 border font-bold text-green-600">
-                            {{ $item->total_cup }} cup
-                        </td>
-                        <td class="p-2 border font-bold text-blue-600">
-                            Rp
-                            {{ number_format($item->pendapatan ?? 0, 0, ',', '.') }}
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        @endif
-    </div>
-
-    <!-- Rincian Pendapatan Per User All Time -->
-    <div class="bg-white p-6 rounded-xl shadow mb-10">
-        <h2 class="text-lg font-semibold mb-4">
-             Pendapatan Rider (All Time)
-        </h2>
-        @if($penjualanPerUserAllTime->isEmpty())
-        <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
-            Belum ada data penjualan.
-        </div>
-        @else
-        <div class="overflow-x-auto">
-            <table
-                class="w-full text-sm text-left border border-gray-200 rounded-lg"
-            >
-                <thead class="bg-gray-100 text-gray-700">
-                    <tr>
-                        <th class="p-2 border">#</th>
-                        <th class="p-2 border">Nama User</th>
-                        <th class="p-2 border">Email</th>
-                        <th class="p-2 border">Total Cup Terjual</th>
-                        <th class="p-2 border">Pendapatan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($penjualanPerUserAllTime as $key => $item)
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-2 border">{{ $key + 1 }}</td>
-                        <td class="p-2 border">
-                            {{ $item->user?->name ?? 'User dihapus' }}
-                        </td>
-                        <td class="p-2 border">
-                            {{ $item->user?->email ?? '-' }}
-                        </td>
-                        <td class="p-2 border font-bold text-green-600">
-                            {{ $item->total_cup }} cup
-                        </td>
-                        <td class="p-2 border font-bold text-blue-600">
-                            Rp
-                            {{ number_format($item->pendapatan ?? 0, 0, ',', '.') }}
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        @endif
-    </div>
 
      <!-- Bar Chart: Bahan Terpakai Hari Ini -->
         <div
