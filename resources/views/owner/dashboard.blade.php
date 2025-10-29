@@ -251,7 +251,7 @@
         @endif
     </div>
 
-        <!-- ============================= -->
+    <!-- ============================= -->
     <!-- 📊 Grafik Driver: Bulanan & Tahunan (Side-by-Side) -->
     <!-- ============================= -->
     <div class="w-full flex flex-row justify-between items-stretch gap-6 mt-8 mb-10 overflow-x-auto">
@@ -264,6 +264,9 @@
             <div class="h-[400px] w-full flex items-center justify-center">
                 <canvas id="chartBulananDriver" class="w-full h-full"></canvas>
             </div>
+
+            <!-- ✅ Legend di bawah chart -->
+            <div id="legend-bulanan" class="mt-4 text-center"></div>
         </div>
 
         <!-- 📈 Grafik Tahunan -->
@@ -274,9 +277,12 @@
             <div class="h-[400px] w-full flex items-center justify-center">
                 <canvas id="chartTahunanDriver" class="w-full h-full"></canvas>
             </div>
-        </div>
 
+            <!-- ✅ Legend di bawah chart -->
+            <div id="legend-tahunan" class="mt-4 text-center"></div>
+        </div>
     </div>
+
 
     <!-- Data User -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10 mt-6">
@@ -1103,6 +1109,52 @@
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+
+    // =========================
+    // Plugin Legend Rapi (Grid)
+    // =========================
+    const htmlLegendPlugin = {
+        id: 'htmlLegend',
+        afterUpdate(chart, args, options) {
+            const container = document.getElementById(options.containerID);
+            if (!container) return;
+            container.innerHTML = '';
+
+            const list = document.createElement('div');
+            list.style.display = 'flex';
+            list.style.flexWrap = 'wrap';
+            list.style.justifyContent = 'center';
+            list.style.gap = '10px';
+            list.style.marginTop = '10px';
+
+            const items = chart.options.plugins.legend.labels.generateLabels(chart);
+            items.forEach(item => {
+                const legendItem = document.createElement('div');
+                legendItem.style.display = 'flex';
+                legendItem.style.alignItems = 'center';
+                legendItem.style.gap = '6px';
+                legendItem.style.fontSize = '12px';
+                legendItem.style.color = '#374151';
+
+                const box = document.createElement('span');
+                box.style.width = '12px';
+                box.style.height = '12px';
+                box.style.borderRadius = '50%';
+                box.style.background = item.fillStyle;
+                box.style.border = '1px solid #d1d5db';
+
+                const text = document.createElement('span');
+                text.textContent = item.text;
+
+                legendItem.appendChild(box);
+                legendItem.appendChild(text);
+                list.appendChild(legendItem);
+            });
+
+            container.appendChild(list);
+        }
+    };
+
     // =========================
     // 8. Grafik Bulanan per Driver (Cup & Pendapatan)
     // =========================
@@ -1112,13 +1164,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const dataBulanan = @json($grafikBulananDriver);
         const warna = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#14b8a6','#f43f5e','#6366f1'];
         const bulanLabels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-
         const datasetsBulanan = [];
 
         Object.values(dataBulanan).forEach((driver, i) => {
             const nama = driver[0]?.nama_driver ?? 'Driver ' + (i + 1);
             const dataCup = Array(12).fill(0);
             const dataPendapatan = Array(12).fill(0);
+
             driver.forEach(d => {
                 const idx = parseInt(d.bulan) - 1;
                 if (idx >= 0 && idx < 12) {
@@ -1164,15 +1216,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 responsive: true,
                 interaction: { mode: "index", intersect: false },
                 plugins: {
-                    legend: {
-                        position: "bottom",
-                        labels: {
-                            color: "#374151",
-                            font: { size: 13, weight: "500" },
-                            padding: 15,
-                            usePointStyle: true
-                        }
-                    },
+                    legend: { display: false },
+                    htmlLegend: { containerID: 'legend-bulanan' },
                     title: {
                         display: true,
                         text: "📅 Cup & Pendapatan Bulanan per Driver",
@@ -1216,7 +1261,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         grid: { drawOnChartArea: false }
                     }
                 }
-            }
+            },
+            plugins: [htmlLegendPlugin]
         });
     }
 
@@ -1272,15 +1318,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 responsive: true,
                 interaction: { mode: "index", intersect: false },
                 plugins: {
-                    legend: {
-                        position: "bottom",
-                        labels: {
-                            color: "#374151",
-                            font: { size: 13, weight: "500" },
-                            padding: 15,
-                            usePointStyle: true
-                        }
-                    },
+                    legend: { display: false },
+                    htmlLegend: { containerID: 'legend-tahunan' },
                     title: {
                         display: true,
                         text: "📊 Cup & Pendapatan Tahunan per Driver",
@@ -1324,10 +1363,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         grid: { drawOnChartArea: false }
                     }
                 }
-            }
+            },
+            plugins: [htmlLegendPlugin]
         });
     }
-    });
+});
     
 </script>
 
