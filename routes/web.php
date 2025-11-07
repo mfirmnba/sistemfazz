@@ -54,10 +54,22 @@ Route::middleware(['auth', 'role:owner'])
     ->group(function () {
         Route::get('/dashboard', [OwnerDashboard::class, 'index'])->name('dashboard');
         Route::resource('minuman', \App\Http\Controllers\Owner\MinumanController::class);
-        Route::get('/profit', [\App\Http\Controllers\Owner\ProfitController::class, 'index'])->name('profit.index');
-        Route::get('/omset', [\App\Http\Controllers\Owner\OmsetController::class, 'index'])->name('omset.index');
-        Route::get('/penjualan', [\App\Http\Controllers\Owner\PenjualanController::class, 'index'])->name('penjualan.index');
-        Route::get('/stock', [\App\Http\Controllers\Owner\StockController::class, 'index'])->name('stock.index');
+        // Halaman detail statistik
+        Route::get('/profit', function() {
+            return view('owner.laporan.profit');
+        })->name('profit');
+
+        Route::get('/omset', function() {
+            return view('owner.laporan.omset');
+        })->name('omset');
+
+        Route::get('/penjualan', function() {
+            return view('owner.laporan.penjualan');
+        })->name('penjualan');
+
+        Route::get('/stock', function() {
+            return view('owner.laporan.stock');
+        })->name('stock');
     });
 
 Route::middleware(['auth', 'role:driver'])
