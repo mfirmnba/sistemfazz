@@ -78,18 +78,18 @@
             <h2 class="text-2xl font-bold">
                 {{ $totalCupTerjual ?? 0 }} cup
             </h2>
-            <a href="#" class="text-blue-500 text-sm">View data →</a>
+            <a href="#minuman-terjual" class="text-blue-500 text-sm">View data →</a>
         </div>
 
         <div class="bg-white p-4 shadow rounded-lg">
             <p class="text-gray-500">Expired Hari Ini</p>
             <h2 class="text-2xl font-bold">{{ $totalExpired ?? 0 }}</h2>
-            <a href="#" class="text-blue-500 text-sm">View data →</a>
+            <a href="#expired" class="text-blue-500 text-sm">View data →</a>
         </div>
         <div class="bg-white p-4 shadow rounded-lg">
             <p class="text-gray-500">Tumpah Hari Ini</p>
             <h2 class="text-2xl font-bold">{{ $totalTumpah ?? 0 }}</h2>
-            <a href="#" class="text-blue-500 text-sm">View data →</a>
+            <a href="#expired" class="text-blue-500 text-sm">View data →</a>
         </div>
     </div>
 
@@ -389,7 +389,7 @@
     </div>
 
     <!-- Chart: Keuntungan Minuman -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-6 ">
+    <div id= "expired" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-6 ">
         <div class="mt-8 bg-white p-4 rounded-xl shadow">
             <h2 class="text-lg font-semibold mb-3 text-gray-800">
                  Grafik Keuntungan Minuman
