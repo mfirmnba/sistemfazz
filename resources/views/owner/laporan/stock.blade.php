@@ -4,22 +4,16 @@
 <div class="p-6 bg-white rounded-xl shadow">
     <h2 class="text-2xl font-bold text-blue-700 mb-4">📦 Laporan Stok</h2>
 
-    {{-- 🔹 Total Stok Digunakan --}}
-    <h3 class="text-lg font-semibold text-gray-700">
-        Total Pemakaian Stok {{ $selectedMonth ? 'Bulan '.$bulanLabels[$selectedMonth-1].' ' : 'Tahun ' }}{{ $selectedYear }}
-    </h3>
-    <p class="text-2xl font-bold text-blue-600 mb-4">
-        {{ number_format($totalStockUsed, 0, ',', '.') }} unit
-    </p>
-
     {{-- 🔹 Grafik Stok --}}
     <canvas id="stockChart" height="100"></canvas>
 </div>
 
 {{-- 🔹 Daftar Stok yang Digunakan --}}
 <div class="bg-white p-6 rounded-xl shadow mt-6">
-        {{-- 🔹 Filter Tahun & Bulan --}}
-    <form method="GET" action="{{ route('owner.laporan.stock') }}" class="flex flex-wrap items-center gap-3 mb-6">
+
+    {{-- 🔹 Filter Tahun & Bulan --}}
+    <form method="GET" action="{{ route('owner.laporan.stock') }}" class="flex flex-wrap items-center gap-6 mb-6">
+
         <div>
             <label for="year" class="mr-2 font-semibold">Pilih Tahun:</label>
             <select name="year" id="year" onchange="this.form.submit()" class="border rounded p-2">
@@ -30,13 +24,6 @@
                 @endforeach
             </select>
         </div>
-            {{-- 🔹 Total Stok Digunakan --}}
-    <h3 class="text-lg font-semibold text-gray-700">
-        Total Pemakaian Stok {{ $selectedMonth ? 'Bulan '.$bulanLabels[$selectedMonth-1].' ' : 'Tahun ' }}{{ $selectedYear }}
-    </h3>
-    <p class="text-2xl font-bold text-blue-600 mb-4">
-        {{ number_format($totalStockUsed, 0, ',', '.') }} unit
-    </p>
 
         <div>
             <label for="month" class="mr-2 font-semibold">Pilih Bulan:</label>
@@ -49,7 +36,20 @@
                 @endforeach
             </select>
         </div>
+
     </form>
+
+    {{-- 🔹 Total Stok Digunakan --}}
+    <h3 class="text-lg font-semibold text-gray-700">
+        Total Pemakaian Stok
+        {{ $selectedMonth ? 'Bulan '.$bulanLabels[$selectedMonth-1].' ' : 'Tahun ' }}
+        {{ $selectedYear }}
+    </h3>
+    <p class="text-2xl font-bold text-blue-600 mb-4">
+        {{ number_format($totalStockUsed, 0, ',', '.') }} unit
+    </p>
+
+    {{-- 🔹 Tabel Daftar Stok --}}
     <h2 class="text-xl font-semibold text-gray-800 mb-4">📋 Daftar Stok yang Digunakan</h2>
 
     <table class="w-full text-sm border border-gray-200 rounded-lg">
@@ -100,7 +100,9 @@ new Chart(ctx, {
     },
     options: {
         responsive: true,
-        scales: { y: { beginAtZero: true } }
+        scales: {
+            y: { beginAtZero: true }
+        }
     }
 });
 </script>
