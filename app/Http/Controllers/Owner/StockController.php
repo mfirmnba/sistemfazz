@@ -8,7 +8,7 @@ use App\Models\LaporanPenjualan;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-class StockProfitController extends Controller
+class StockController extends Controller
 {
     public function index(Request $request)
     {
