@@ -4,7 +4,7 @@
 <div class="p-6 bg-white rounded-xl shadow">
     <h2 class="text-2xl font-bold text-blue-700 mb-4">📦 Laporan Stok</h2>
 
-    <form method="GET" action="{{ route('stock') }}" class="mb-6">
+    <form method="GET" action="{{ route('owner.laporan.stock') }}" class="mb-6">
         <label for="year" class="mr-2 font-semibold">Pilih Tahun:</label>
         <select name="year" id="year" onchange="this.form.submit()" class="border rounded p-2">
             @foreach ($availableYears as $year)
