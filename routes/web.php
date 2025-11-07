@@ -7,6 +7,10 @@ use App\Http\Controllers\Owner\DashboardController as OwnerDashboard;
 use App\Http\Controllers\Driver\DashboardController as DriverDashboard;
 use App\Http\Controllers\Produksi\DashboardController as ProduksiDashboard;
 use App\Http\Controllers\Produksi\LaporanProduksiController;
+use App\Http\Controllers\Owner\ProfitController;
+use App\Http\Controllers\Owner\OmsetController;
+use App\Http\Controllers\Owner\PenjualanController;
+use App\Http\Controllers\Owner\StockProfitController;
 
 // ======================
 // Halaman depan
