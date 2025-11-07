@@ -210,6 +210,18 @@ class DashboardController extends Controller
             ->groupBy('tanggal');
 
         // =============================================================
+        // 🔹 Pendapatan Per User Bulanan
+        // =============================================================
+        $penjualanPerUserMonthly = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+            ->whereMonth('laporan_penjualans.tanggal', now()->month)
+            ->whereYear('laporan_penjualans.tanggal', now()->year)
+            ->where('laporan_penjualans.status', 'terjual')
+            ->selectRaw('laporan_penjualans.user_id, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as pendapatan')
+            ->groupBy('laporan_penjualans.user_id')
+            ->get();
+
+
+        // =============================================================
         // 🔹 RETURN
         // =============================================================
         return view('owner.dashboard', compact(
@@ -222,7 +234,7 @@ class DashboardController extends Controller
             'totalKeuntunganBulanan', 'penjualanMinuman', 'pendapatanDriverHarian',
             'minumanTerjualPerDriverToday', 'pendapatanSemuaDriverHarian',
             'minumanTerjualPerHari', 'grafikBulananDriver', 'grafikTahunanDriver',
-            'stokMingguan'
+            'stokMingguan', 'penjualanPerUserMonthly'
         ));
     }
 }

@@ -140,6 +140,45 @@
         </div>
         @endif
     </div>
+    <!-- Rincian Pendapatan Per User Bulanan (urutan nomor 5.5) -->
+    <div class="bg-white p-6 rounded-xl shadow mb-10 mt-6">
+        <h2 class="text-lg font-semibold mb-4">
+            Pendapatan Rider (Bulan {{ \Carbon\Carbon::now()->translatedFormat('F Y') }})
+        </h2>
+        @if($penjualanPerUserMonthly->isEmpty())
+            <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
+                Belum ada data penjualan bulan ini.
+            </div>
+        @else
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left border border-gray-200 rounded-lg">
+                    <thead class="bg-gray-100 text-gray-700">
+                        <tr>
+                            <th class="p-2 border">#</th>
+                            <th class="p-2 border">Nama User</th>
+                            <th class="p-2 border">Email</th>
+                            <th class="p-2 border">Total Cup Terjual</th>
+                            <th class="p-2 border">Pendapatan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($penjualanPerUserMonthly as $key => $item)
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-2 border">{{ $key + 1 }}</td>
+                            <td class="p-2 border">{{ $item->user?->name ?? 'User dihapus' }}</td>
+                            <td class="p-2 border">{{ $item->user?->email ?? '-' }}</td>
+                            <td class="p-2 border font-bold text-green-600">{{ $item->total_cup }} cup</td>
+                            <td class="p-2 border font-bold text-blue-600">
+                                Rp {{ number_format($item->pendapatan ?? 0, 0, ',', '.') }}
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
+
         <!-- 🥤 Minuman Terjual Hari Ini per Driver urutan nomor 3 -->
     <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
         <h2 class="text-xl font-semibold mb-4">
