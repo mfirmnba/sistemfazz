@@ -11,6 +11,9 @@
         <script src="//unpkg.com/alpinejs" defer></script>
     </head>
     <style>
+        html {
+        scroll-behavior: smooth;
+        }
         /* ======== RESPONSIVE FIXES TANPA UBAH STRUKTUR ======== */
 
         /* Default untuk desktop tetap */
