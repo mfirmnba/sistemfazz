@@ -71,7 +71,7 @@
             <h2 class="text-2xl font-bold">
                 Rp{{ number_format($totalPendapatanHariIni  ?? 0, 0, ",", ".") }}
             </h2>
-            <a href="minuman-terjual" class="text-blue-500 text-sm">View data →</a>
+            <a href="#minuman-terjual" class="text-blue-500 text-sm">View data →</a>
         </div>
         <div class="bg-white p-4 shadow rounded-lg">
             <p class="text-gray-500">Cup Terjual Hari Ini</p>
