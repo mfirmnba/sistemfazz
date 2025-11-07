@@ -16,7 +16,7 @@
         </div>
 
         {{-- Kotak Login --}}
-        <div class="relative z-10 bg-white/10 backdrop-blur-2xl shadow-2xl rounded-3xl p-10 text-center border border-white/30 max-w-md w-[90%]">
+        <div class="relative z-10 bg-red/10 backdrop-blur-2xl shadow-2xl rounded-3xl p-10 text-center border border-white/30 max-w-md w-[90%]">
             
             {{-- Logo --}}
             <div class="flex justify-center mb-6">
