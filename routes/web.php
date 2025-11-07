@@ -62,7 +62,7 @@ Route::middleware(['auth', 'role:owner'])
         Route::get('/profit', [ProfitController::class, 'index'])->name('profit');
         Route::get('/omset', [OmsetController::class, 'index'])->name('omset');
         Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan');
-        Route::get('/stock', [StockController::class, 'index'])->name('stock');
+        Route::get('/stock', [StockController::class, 'index'])->name('laporan.stock');
 
     });
 
