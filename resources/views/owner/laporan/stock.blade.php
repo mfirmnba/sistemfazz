@@ -30,6 +30,13 @@
                 @endforeach
             </select>
         </div>
+            {{-- 🔹 Total Stok Digunakan --}}
+    <h3 class="text-lg font-semibold text-gray-700">
+        Total Pemakaian Stok {{ $selectedMonth ? 'Bulan '.$bulanLabels[$selectedMonth-1].' ' : 'Tahun ' }}{{ $selectedYear }}
+    </h3>
+    <p class="text-2xl font-bold text-blue-600 mb-4">
+        {{ number_format($totalStockUsed, 0, ',', '.') }} unit
+    </p>
 
         <div>
             <label for="month" class="mr-2 font-semibold">Pilih Bulan:</label>
