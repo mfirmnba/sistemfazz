@@ -54,6 +54,10 @@ Route::middleware(['auth', 'role:owner'])
     ->group(function () {
         Route::get('/dashboard', [OwnerDashboard::class, 'index'])->name('dashboard');
         Route::resource('minuman', \App\Http\Controllers\Owner\MinumanController::class);
+        Route::get('/profit', [\App\Http\Controllers\Owner\ProfitController::class, 'index'])->name('profit.index');
+        Route::get('/omset', [\App\Http\Controllers\Owner\OmsetController::class, 'index'])->name('omset.index');
+        Route::get('/penjualan', [\App\Http\Controllers\Owner\PenjualanController::class, 'index'])->name('penjualan.index');
+        Route::get('/stock', [\App\Http\Controllers\Owner\StockController::class, 'index'])->name('stock.index');
     });
 
 Route::middleware(['auth', 'role:driver'])
