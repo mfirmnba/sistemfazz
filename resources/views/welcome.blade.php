@@ -28,7 +28,7 @@
             </h1>
 
             <a href="{{ route('login') }}"
-               class="inline-block mt-2 px-10 py-3 bg-gradient-to-r from-rose-500 to-red-400 text-white font-semibold rounded-full shadow-md hover:from-rose-600 hover:to-red-500 hover:shadow-lg transition-all duration-300">
+               class="inline-block mt-2 px-10 py-3 bg-gradient-to-r from-rose-500 to-red-400 text-black font-semibold rounded-full shadow-md hover:from-rose-600 hover:to-red-500 hover:shadow-lg transition-all duration-300">
                Masuk Sekarang →
             </a>
         </div>
