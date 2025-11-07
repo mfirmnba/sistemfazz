@@ -389,7 +389,7 @@
     </div>
 
     <!-- Chart: Keuntungan Minuman -->
-    <div id= "expired" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-6 ">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 mt-6 ">
         <div class="mt-8 bg-white p-4 rounded-xl shadow">
             <h2 class="text-lg font-semibold mb-3 text-gray-800">
                  Grafik Keuntungan Minuman
@@ -472,7 +472,7 @@
 
     {{-- ============================= --}}
     <!-- Line Chart: Total Cup Terjual -->
-        <div
+        <div id= "expired"
             class="bg-white p-4 shadow rounded-lg transform transition duration-700 hover:scale-105 animate-fade-in delay-200"
         >
             <h3 class="text-lg font-semibold mb-3">Minuman Terjual</h3>
