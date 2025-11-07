@@ -60,7 +60,7 @@
         <div class="bg-white p-4 shadow rounded-lg">
             <p class="text-gray-500">Stock Tersedia</p>
             <h2 class="text-2xl font-bold">{{ $totalStock ?? 0 }}</h2>
-            <a href="{{ route('owner.stock') }}" class="text-blue-500 text-sm">View data →</a>
+            <a href="{{ route('owner.laporan.stock') }}" class="text-blue-500 text-sm">View data →</a>
         </div>
     </div>
 
