@@ -4,31 +4,48 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\LaporanPenjualan;
-use App\Models\User;
-use App\Models\Minuman;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class PenjualanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $today = now()->toDateString();
+        // Tahun dipilih, default tahun ini
+        $selectedYear = $request->get('year', Carbon::now()->year);
 
-        $penjualanHariIni = LaporanPenjualan::with(['user', 'minuman'])
-            ->whereDate('tanggal', $today)
-            ->where('status', 'terjual')
-            ->get();
+        // Ambil daftar tahun tersedia
+        $availableYears = LaporanPenjualan::selectRaw('YEAR(tanggal) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
 
-        $totalCupTerjual = $penjualanHariIni->sum('jumlah');
+        // Total minuman terjual tahun terpilih
+        $totalTerjual = LaporanPenjualan::where('status', 'terjual')
+            ->whereYear('tanggal', $selectedYear)
+            ->sum('jumlah');
 
-        $penjualanPerDriver = LaporanPenjualan::join('users', 'laporan_penjualans.user_id', '=', 'users.id')
-            ->join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
-            ->where('laporan_penjualans.status', 'terjual')
-            ->selectRaw('users.name as driver, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as pendapatan')
-            ->groupBy('users.name')
-            ->orderByDesc('pendapatan')
-            ->get();
+        // Data per bulan
+        $monthlyData = LaporanPenjualan::where('status', 'terjual')
+            ->whereYear('tanggal', $selectedYear)
+            ->get()
+            ->groupBy(fn($i) => Carbon::parse($i->tanggal)->format('m'))
+            ->map(fn($items) => $items->sum('jumlah'));
 
-        return view('owner.laporan.penjualan', compact('penjualanHariIni', 'totalCupTerjual', 'penjualanPerDriver'));
+        $bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $penjualanData = [];
+
+        foreach (range(1, 12) as $b) {
+            $key = str_pad($b, 2, '0', STR_PAD_LEFT);
+            $penjualanData[] = $monthlyData[$key] ?? 0;
+        }
+
+        return view('owner.laporan.penjualan', compact(
+            'selectedYear',
+            'availableYears',
+            'totalTerjual',
+            'bulanLabels',
+            'penjualanData'
+        ));
     }
 }

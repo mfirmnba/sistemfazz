@@ -2,55 +2,51 @@
 
 @section('content')
 <div class="p-6 bg-white rounded-xl shadow">
-    <h2 class="text-2xl font-bold text-orange-700 mb-4">🧃 Laporan Penjualan</h2>
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-orange-700">🍹 Laporan Penjualan Minuman</h2>
 
-    <p class="text-gray-600 mb-2">Tanggal: <strong>{{ $today }}</strong></p>
-    <p class="text-lg font-semibold mb-4">Total Cup Terjual: <span class="text-orange-600">{{ number_format($totalCupTerjual) }}</span></p>
-
-    <div class="grid md:grid-cols-2 gap-6">
-        <!-- Penjualan per driver -->
-        <div>
-            <h3 class="font-bold text-gray-700 mb-2">📦 Penjualan per Driver</h3>
-            <table class="w-full border border-gray-200 text-sm">
-                <thead class="bg-gray-100">
-                    <tr class="text-left">
-                        <th class="p-2 border">Driver</th>
-                        <th class="p-2 border">Cup</th>
-                        <th class="p-2 border">Pendapatan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($penjualanPerDriver as $d)
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-2 border">{{ $d->driver }}</td>
-                        <td class="p-2 border text-center">{{ $d->total_cup }}</td>
-                        <td class="p-2 border text-right">Rp {{ number_format($d->pendapatan, 0, ',', '.') }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Penjualan per minuman -->
-        <div>
-            <h3 class="font-bold text-gray-700 mb-2">🥤 Penjualan per Minuman</h3>
-            <table class="w-full border border-gray-200 text-sm">
-                <thead class="bg-gray-100">
-                    <tr class="text-left">
-                        <th class="p-2 border">Nama Minuman</th>
-                        <th class="p-2 border">Total Terjual</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($penjualanMinuman as $m)
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-2 border">{{ $m->minuman->nama_minuman ?? '-' }}</td>
-                        <td class="p-2 border text-center">{{ $m->total_qty }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        <!-- Dropdown pilih tahun -->
+        <form method="GET" action="{{ route('owner.penjualan') }}">
+            <select name="year" onchange="this.form.submit()" class="border rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                @foreach ($availableYears as $year)
+                    <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
+                        {{ $year }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
     </div>
+
+    <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-700">Total Minuman Terjual Tahun {{ $selectedYear }}</h3>
+        <p class="text-3xl font-bold text-orange-600">{{ number_format($totalTerjual, 0, ',', '.') }}</p>
+    </div>
+
+    <canvas id="penjualanChart" height="100"></canvas>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('penjualanChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: @json($bulanLabels),
+        datasets: [{
+            label: 'Jumlah Minuman Terjual',
+            data: @json($penjualanData),
+            backgroundColor: 'rgba(249, 115, 22, 0.5)',
+            borderColor: 'rgb(249, 115, 22)',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } },
+        plugins: {
+            legend: { display: true, position: 'top' }
+        }
+    }
+});
+</script>
 @endsection

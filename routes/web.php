@@ -61,11 +61,7 @@ Route::middleware(['auth', 'role:owner'])
         // Halaman detail statistik
         Route::get('/profit', [ProfitController::class, 'index'])->name('profit');
         Route::get('/omset', [OmsetController::class, 'index'])->name('omset');
-
-        Route::get('/penjualan', function() {
-            return view('owner.laporan.penjualan');
-        })->name('penjualan');
-
+        Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan');
         Route::get('/stock', function() {
             return view('owner.laporan.stock');
         })->name('stock');
