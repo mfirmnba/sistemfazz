@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Owner;
 use App\Http\Controllers\Controller;
 use App\Models\LaporanPenjualan;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Models\Minuman;
+use Carbon\Carbon;
 
 class PenjualanController extends Controller
 {
@@ -13,27 +14,21 @@ class PenjualanController extends Controller
     {
         $today = now()->toDateString();
 
-        // Total cup terjual
-        $totalCupTerjual = LaporanPenjualan::where('status', 'terjual')->sum('jumlah');
+        $penjualanHariIni = LaporanPenjualan::with(['user', 'minuman'])
+            ->whereDate('tanggal', $today)
+            ->where('status', 'terjual')
+            ->get();
 
-        // Penjualan per driver hari ini
+        $totalCupTerjual = $penjualanHariIni->sum('jumlah');
+
         $penjualanPerDriver = LaporanPenjualan::join('users', 'laporan_penjualans.user_id', '=', 'users.id')
             ->join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
-            ->whereDate('laporan_penjualans.tanggal', $today)
             ->where('laporan_penjualans.status', 'terjual')
-            ->select('users.name as driver', DB::raw('SUM(laporan_penjualans.jumlah) as total_cup'), DB::raw('SUM(laporan_penjualans.jumlah * minumans.harga) as pendapatan'))
+            ->selectRaw('users.name as driver, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as pendapatan')
             ->groupBy('users.name')
             ->orderByDesc('pendapatan')
             ->get();
 
-        // Penjualan per minuman (all time)
-        $penjualanMinuman = LaporanPenjualan::with('minuman')
-            ->where('status', 'terjual')
-            ->selectRaw('minuman_id, SUM(jumlah) as total_qty')
-            ->groupBy('minuman_id')
-            ->orderByDesc('total_qty')
-            ->get();
-
-        return view('owner.laporan.penjualan', compact('today', 'totalCupTerjual', 'penjualanPerDriver', 'penjualanMinuman'));
+        return view('owner.laporan.penjualan', compact('penjualanHariIni', 'totalCupTerjual', 'penjualanPerDriver'));
     }
 }

@@ -12,14 +12,15 @@ class StockController extends Controller
     {
         $today = now()->toDateString();
 
-        // Data stok bahan
-        $stocks = Stock::withSum(['laporanProduksi as terpakai_total'], 'jumlah_digunakan')
-            ->orderBy('nama_bahan')
-            ->get();
+        $stocks = Stock::withSum(['laporanProduksi as terpakai_hari_ini' => function($q) use ($today) {
+            $q->whereDate('tanggal', $today);
+        }], 'jumlah_digunakan')
+        ->withSum('laporanProduksi as terpakai_total', 'jumlah_digunakan')
+        ->orderBy('nama_bahan')
+        ->get();
 
         $totalStock = $stocks->sum('jumlah');
 
-        // Stok terpakai harian (7 hari terakhir)
         $stokMingguan = LaporanProduksi::selectRaw('DATE(tanggal) as tanggal, SUM(jumlah_digunakan) as total_stok')
             ->whereBetween('tanggal', [now()->subDays(6), now()])
             ->groupBy('tanggal')

@@ -4,32 +4,24 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\LaporanPenjualan;
-use Illuminate\Support\Facades\DB;
+use App\Models\Minuman;
 
 class OmsetController extends Controller
 {
     public function index()
     {
-        // Total pendapatan (omset)
-        $totalOmset = LaporanPenjualan::with('minuman')
+        $totalPendapatan = LaporanPenjualan::with('minuman')
             ->where('status', 'terjual')
             ->get()
-            ->sum(fn($i) => ($i->jumlah ?? 0) * ($i->minuman->harga ?? 0));
+            ->sum(fn($item) => ($item->jumlah ?? 0) * ($item->minuman->harga ?? 0));
 
-        // Omset per bulan
-        $monthlyOmset = LaporanPenjualan::with('minuman')
-            ->where('status', 'terjual')
-            ->get()
-            ->groupBy(fn($i) => \Carbon\Carbon::parse($i->tanggal)->format('m'))
-            ->map(fn($items) => $items->sum(fn($i) => ($i->jumlah ?? 0) * ($i->minuman->harga ?? 0)));
+        $omsetPerMinuman = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+            ->where('laporan_penjualans.status', 'terjual')
+            ->selectRaw('minumans.nama, SUM(laporan_penjualans.jumlah) as total_cup, SUM(laporan_penjualans.jumlah * minumans.harga) as total_omset')
+            ->groupBy('minumans.nama')
+            ->orderByDesc('total_omset')
+            ->get();
 
-        $bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        $omsetData = [];
-        foreach (range(1, 12) as $b) {
-            $key = str_pad($b, 2, '0', STR_PAD_LEFT);
-            $omsetData[] = $monthlyOmset[$key] ?? 0;
-        }
-
-        return view('owner.laporan.omset', compact('totalOmset', 'bulanLabels', 'omsetData'));
+        return view('owner.laporan.omset', compact('totalPendapatan', 'omsetPerMinuman'));
     }
 }

@@ -4,32 +4,24 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\LaporanPenjualan;
-use Illuminate\Support\Facades\DB;
+use App\Models\Minuman;
 
 class ProfitController extends Controller
 {
     public function index()
     {
-        // Total profit all time
-        $totalProfit = LaporanPenjualan::with('minuman')
+        $totalKeuntunganSemua = LaporanPenjualan::with('minuman')
             ->where('status', 'terjual')
             ->get()
-            ->sum(fn($i) => (($i->minuman->harga ?? 0) - ($i->minuman->hpp ?? 0)) * ($i->jumlah ?? 0));
+            ->sum(fn($item) => (($item->minuman->harga ?? 0) - ($item->minuman->hpp ?? 0)) * ($item->jumlah ?? 0));
 
-        // Profit per bulan
-        $monthlyProfit = LaporanPenjualan::with('minuman')
-            ->where('status', 'terjual')
-            ->get()
-            ->groupBy(fn($i) => \Carbon\Carbon::parse($i->tanggal)->format('m'))
-            ->map(fn($items) => $items->sum(fn($i) => (($i->minuman->harga ?? 0) - ($i->minuman->hpp ?? 0)) * ($i->jumlah ?? 0)));
+        $profitPerMinuman = LaporanPenjualan::join('minumans', 'laporan_penjualans.minuman_id', '=', 'minumans.id')
+            ->where('laporan_penjualans.status', 'terjual')
+            ->selectRaw('minumans.nama, SUM(laporan_penjualans.jumlah) as total_cup, SUM((minumans.harga - minumans.hpp) * laporan_penjualans.jumlah) as total_profit')
+            ->groupBy('minumans.nama')
+            ->orderByDesc('total_profit')
+            ->get();
 
-        $bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        $profitData = [];
-        foreach (range(1, 12) as $b) {
-            $key = str_pad($b, 2, '0', STR_PAD_LEFT);
-            $profitData[] = $monthlyProfit[$key] ?? 0;
-        }
-
-        return view('owner.laporan.profit', compact('totalProfit', 'bulanLabels', 'profitData'));
+        return view('owner.laporan.profit', compact('totalKeuntunganSemua', 'profitPerMinuman'));
     }
 }
