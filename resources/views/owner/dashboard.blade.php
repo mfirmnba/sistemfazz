@@ -140,14 +140,46 @@
         </div>
         @endif
     </div>
-    <!-- Rincian Pendapatan Per User Bulanan (urutan nomor 5.5) -->
+    <!-- 🔹 Pendapatan Rider Per Bulan -->
     <div class="bg-white p-6 rounded-xl shadow mb-10 mt-6">
-        <h2 class="text-lg font-semibold mb-4">
-            Pendapatan Rider (Bulan {{ \Carbon\Carbon::now()->translatedFormat('F Y') }})
-        </h2>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
+            <h2 class="text-lg font-semibold text-gray-800">
+                Pendapatan Rider Bulanan
+            </h2>
+
+            <!-- 🔽 Filter Bulan & Tahun -->
+            <form method="GET" action="{{ route('owner.dashboard') }}" class="flex items-center gap-2">
+                <select name="month" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-red-300">
+                    @for ($m = 1; $m <= 12; $m++)
+                        <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                        </option>
+                    @endfor
+                </select>
+
+                <select name="year" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring focus:ring-red-300">
+                    @for ($y = now()->year; $y >= now()->year - 3; $y--)
+                        <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
+                    @endfor
+                </select>
+
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition">
+                    Tampilkan
+                </button>
+            </form>
+        </div>
+
+        <h3 class="text-gray-700 mb-3">
+            Bulan: <span class="font-semibold text-red-600">
+                {{ \Carbon\Carbon::create(request('year', now()->year), request('month', now()->month))->translatedFormat('F Y') }}
+            </span>
+        </h3>
+
         @if($penjualanPerUserMonthly->isEmpty())
             <div class="bg-yellow-100 text-yellow-800 p-4 rounded">
-                Belum ada data penjualan bulan ini.
+                Belum ada data penjualan untuk bulan ini.
             </div>
         @else
             <div class="overflow-x-auto">
@@ -163,22 +195,21 @@
                     </thead>
                     <tbody>
                         @foreach($penjualanPerUserMonthly as $key => $item)
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-2 border">{{ $key + 1 }}</td>
-                            <td class="p-2 border">{{ $item->user?->name ?? 'User dihapus' }}</td>
-                            <td class="p-2 border">{{ $item->user?->email ?? '-' }}</td>
-                            <td class="p-2 border font-bold text-green-600">{{ $item->total_cup }} cup</td>
-                            <td class="p-2 border font-bold text-blue-600">
-                                Rp {{ number_format($item->pendapatan ?? 0, 0, ',', '.') }}
-                            </td>
-                        </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-2 border">{{ $key + 1 }}</td>
+                                <td class="p-2 border">{{ $item->user?->name ?? 'User dihapus' }}</td>
+                                <td class="p-2 border">{{ $item->user?->email ?? '-' }}</td>
+                                <td class="p-2 border font-bold text-green-600">{{ $item->total_cup }} cup</td>
+                                <td class="p-2 border font-bold text-blue-600">
+                                    Rp {{ number_format($item->pendapatan ?? 0, 0, ',', '.') }}
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
         @endif
     </div>
-
         <!-- 🥤 Minuman Terjual Hari Ini per Driver urutan nomor 3 -->
     <div class="bg-white p-6 rounded-xl shadow mt-10 mb-10">
         <h2 class="text-xl font-semibold mb-4">
