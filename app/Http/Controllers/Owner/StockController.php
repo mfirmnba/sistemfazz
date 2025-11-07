@@ -3,61 +3,55 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
-use App\Models\StockMasuk;
-use App\Models\LaporanPenjualan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Stock;
+use App\Models\LaporanProduksi;
 use Carbon\Carbon;
 
 class StockController extends Controller
 {
     public function index(Request $request)
     {
-        // Tahun dipilih, default tahun ini
+        // Tahun dipilih (default: tahun ini)
         $selectedYear = $request->get('year', Carbon::now()->year);
 
-        // Ambil daftar tahun yang tersedia
-        $availableYears = StockHistory::selectRaw('YEAR(tanggal) as year')
+        // Ambil daftar tahun yang tersedia dari data produksi
+        $availableYears = LaporanProduksi::selectRaw('YEAR(tanggal) as year')
             ->distinct()
-            ->union(
-                LaporanPenjualan::selectRaw('YEAR(tanggal) as year')->distinct()
-            )
             ->orderBy('year', 'desc')
             ->pluck('year');
 
-        // Total stok tersedia = stok masuk - stok keluar (penjualan)
-        $totalMasuk = StockHistory::whereYear('tanggal', $selectedYear)->sum('kuantitas');
-        $totalKeluar = LaporanPenjualan::where('status', 'terjual')
+        // Ambil data stok bulanan berdasarkan tahun yang dipilih
+        $monthlyStock = LaporanProduksi::selectRaw('MONTH(tanggal) as month, SUM(jumlah_digunakan) as total_digunakan')
             ->whereYear('tanggal', $selectedYear)
-            ->sum('jumlah');
-        $totalStock = $totalMasuk - $totalKeluar;
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [intval($item->month) => $item->total_digunakan];
+            });
 
-        // Data per bulan
-        $stockMasukBulanan = StockHistory::whereYear('tanggal', $selectedYear)->get()
-            ->groupBy(fn($i) => Carbon::parse($i->tanggal)->format('m'))
-            ->map(fn($items) => $items->sum('kuantitas'));
-
-        $stockKeluarBulanan = LaporanPenjualan::where('status', 'terjual')
-            ->whereYear('tanggal', $selectedYear)->get()
-            ->groupBy(fn($i) => Carbon::parse($i->tanggal)->format('m'))
-            ->map(fn($items) => $items->sum('jumlah'));
-
+        // Siapkan label bulan (Jan - Des)
         $bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        $masukData = [];
-        $keluarData = [];
-
+        $stockData = [];
         foreach (range(1, 12) as $b) {
-            $key = str_pad($b, 2, '0', STR_PAD_LEFT);
-            $masukData[] = $stockHistoryBulanan[$key] ?? 0;
-            $keluarData[] = $stockKeluarBulanan[$key] ?? 0;
+            $stockData[] = $monthlyStock[$b] ?? 0;
         }
+
+        // Total pemakaian stok per tahun
+        $totalStockUsed = array_sum($stockData);
+
+        // Ambil data stok terkini per bahan
+        $stocks = Stock::orderBy('nama_bahan')->get();
 
         return view('owner.laporan.stock', compact(
             'selectedYear',
             'availableYears',
-            'totalStock',
             'bulanLabels',
-            'masukData',
-            'keluarData'
+            'stockData',
+            'totalStockUsed',
+            'stocks'
         ));
     }
 }

@@ -2,25 +2,19 @@
 
 @section('content')
 <div class="p-6 bg-white rounded-xl shadow">
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold text-blue-700">📦 Laporan Stok Tersedia</h2>
+    <h2 class="text-2xl font-bold text-blue-700 mb-4">📦 Laporan Stok</h2>
 
-        <!-- Dropdown pilih tahun -->
-        <form method="GET" action="{{ route('owner.stock') }}">
-            <select name="year" onchange="this.form.submit()" class="border rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                @foreach ($availableYears as $year)
-                    <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
-                        {{ $year }}
-                    </option>
-                @endforeach
-            </select>
-        </form>
-    </div>
+    <form method="GET" action="{{ route('stock') }}" class="mb-6">
+        <label for="year" class="mr-2 font-semibold">Pilih Tahun:</label>
+        <select name="year" id="year" onchange="this.form.submit()" class="border rounded p-2">
+            @foreach ($availableYears as $year)
+                <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>{{ $year }}</option>
+            @endforeach
+        </select>
+    </form>
 
-    <div class="mb-6">
-        <h3 class="text-lg font-semibold text-gray-700">Total Stok Tahun {{ $selectedYear }}</h3>
-        <p class="text-3xl font-bold text-blue-600">{{ number_format($totalStock, 0, ',', '.') }}</p>
-    </div>
+    <h3 class="text-lg font-semibold text-gray-700">Total Pemakaian Stok Tahun {{ $selectedYear }}</h3>
+    <p class="text-2xl font-bold text-blue-600 mb-4">{{ number_format($totalStockUsed, 0, ',', '.') }} unit</p>
 
     <canvas id="stockChart" height="100"></canvas>
 </div>
@@ -32,29 +26,17 @@ new Chart(ctx, {
     type: 'bar',
     data: {
         labels: @json($bulanLabels),
-        datasets: [
-            {
-                label: 'Stok Masuk',
-                data: @json($masukData),
-                backgroundColor: 'rgba(37, 99, 235, 0.5)',
-                borderColor: 'rgb(37, 99, 235)',
-                borderWidth: 2
-            },
-            {
-                label: 'Stok Keluar (Penjualan)',
-                data: @json($keluarData),
-                backgroundColor: 'rgba(239, 68, 68, 0.5)',
-                borderColor: 'rgb(239, 68, 68)',
-                borderWidth: 2
-            }
-        ]
+        datasets: [{
+            label: 'Stok Digunakan (per Bulan)',
+            data: @json($stockData),
+            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+            borderColor: 'rgb(59, 130, 246)',
+            borderWidth: 2
+        }]
     },
     options: {
         responsive: true,
-        scales: { y: { beginAtZero: true } },
-        plugins: {
-            legend: { display: true, position: 'top' }
-        }
+        scales: { y: { beginAtZero: true } }
     }
 });
 </script>
