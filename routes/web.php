@@ -10,7 +10,7 @@ use App\Http\Controllers\Produksi\LaporanProduksiController;
 use App\Http\Controllers\Owner\ProfitController;
 use App\Http\Controllers\Owner\OmsetController;
 use App\Http\Controllers\Owner\PenjualanController;
-use App\Http\Controllers\Owner\StockProfitController;
+use App\Http\Controllers\Owner\StockController;
 
 // ======================
 // Halaman depan
