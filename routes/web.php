@@ -59,10 +59,7 @@ Route::middleware(['auth', 'role:owner'])
         Route::get('/dashboard', [OwnerDashboard::class, 'index'])->name('dashboard');
         Route::resource('minuman', \App\Http\Controllers\Owner\MinumanController::class);
         // Halaman detail statistik
-        Route::get('/profit', function() {
-            return view('owner.laporan.profit');
-        })->name('profit');
-
+        Route::get('/profit', [ProfitController::class, 'index'])->name('profit');
         Route::get('/omset', function() {
             return view('owner.laporan.omset');
         })->name('omset');
