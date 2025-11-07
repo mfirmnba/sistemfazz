@@ -42,25 +42,25 @@
             <h2 class="text-2xl font-bold">
                 Rp{{ number_format($totalKeuntunganSemua ?? 0, 0, ",", ".") }}
             </h2>
-            <a href="#" class="text-blue-500 text-sm">View data →</a>
+            <a href="{{ route('owner.profit') }}" class="text-blue-500 text-sm">View data →</a>
         </div>
         <div class="bg-white p-4 shadow rounded-lg">
             <p class="text-gray-500">Omset</p>
             <h2 class="text-2xl font-bold">
                 Rp{{ number_format($totalPendapatan ?? 0, 0, ",", ".") }}
             </h2>
-            <a href="#" class="text-blue-500 text-sm">View data →</a>
+            <a href="{{ route('owner.omset') }}" class="text-blue-500 text-sm">View data →</a>
         </div>
 
         <div class="bg-white p-4 shadow rounded-lg">
             <p class="text-gray-500">Minuman Terjual</p>
             <h2 class="text-2xl font-bold">{{ $totalOrdersAllTime ?? 0 }}</h2>
-            <a href="#" class="text-blue-500 text-sm">View data →</a>
+            <a href="{{ route('owner.penjualan') }}" class="text-blue-500 text-sm">View data →</a>
         </div>
         <div class="bg-white p-4 shadow rounded-lg">
             <p class="text-gray-500">Stock Tersedia</p>
             <h2 class="text-2xl font-bold">{{ $totalStock ?? 0 }}</h2>
-            <a href="#" class="text-blue-500 text-sm">View data →</a>
+            <a href="{{ route('owner.stock') }}" class="text-blue-500 text-sm">View data →</a>
         </div>
     </div>
 
