@@ -10,6 +10,14 @@ class ProfitController extends Controller
 {
     public function index()
     {
+        // Hitung total profit (keuntungan)
+        $totalProfit = LaporanPenjualan::with('minuman')
+            ->where('status', 'terjual')
+            ->get()
+            ->sum(fn($item) => (($item->minuman->harga ?? 0) - ($item->minuman->hpp ?? 0)) * ($item->jumlah ?? 0));
+
+        // Kamu juga bisa tambahkan data lain kalau perlu
+        $totalPenjualan = LaporanPenjualan::where('status', 'terjual')->sum('jumlah');
         $totalKeuntunganSemua = LaporanPenjualan::with('minuman')
             ->where('status', 'terjual')
             ->get()
