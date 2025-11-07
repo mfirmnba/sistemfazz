@@ -2,52 +2,59 @@
 
 @section('content')
 <div class="p-6 bg-white rounded-xl shadow">
-    <h2 class="text-2xl font-bold text-purple-700 mb-4">📦 Laporan Stok Bahan</h2>
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-blue-700">📦 Laporan Stok Tersedia</h2>
 
-    <p class="text-lg font-semibold mb-4">Total Stok: <span class="text-purple-600">{{ number_format($totalStock, 0, ',', '.') }}</span></p>
-
-    <div class="overflow-x-auto mb-6">
-        <table class="w-full border border-gray-200 text-sm">
-            <thead class="bg-gray-100">
-                <tr class="text-left">
-                    <th class="p-2 border">Nama Bahan</th>
-                    <th class="p-2 border">Jumlah</th>
-                    <th class="p-2 border">Terpakai Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($stocks as $s)
-                <tr class="hover:bg-gray-50">
-                    <td class="p-2 border">{{ $s->nama_bahan }}</td>
-                    <td class="p-2 border text-center">{{ $s->jumlah }}</td>
-                    <td class="p-2 border text-center">{{ $s->terpakai_total ?? 0 }}</td>
-                </tr>
+        <!-- Dropdown pilih tahun -->
+        <form method="GET" action="{{ route('owner.stock') }}">
+            <select name="year" onchange="this.form.submit()" class="border rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @foreach ($availableYears as $year)
+                    <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
+                        {{ $year }}
+                    </option>
                 @endforeach
-            </tbody>
-        </table>
+            </select>
+        </form>
     </div>
 
-    <canvas id="stokChart" height="100"></canvas>
+    <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-700">Total Stok Tahun {{ $selectedYear }}</h3>
+        <p class="text-3xl font-bold text-blue-600">{{ number_format($totalStock, 0, ',', '.') }}</p>
+    </div>
+
+    <canvas id="stockChart" height="100"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const ctxStock = document.getElementById('stokChart').getContext('2d');
-new Chart(ctxStock, {
+const ctx = document.getElementById('stockChart').getContext('2d');
+new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: @json($stokMingguan->pluck('tanggal')),
-        datasets: [{
-            label: 'Pemakaian Stok (7 Hari Terakhir)',
-            data: @json($stokMingguan->pluck('total_stok')),
-            backgroundColor: 'rgba(147, 51, 234, 0.5)',
-            borderColor: 'rgb(147, 51, 234)',
-            borderWidth: 2
-        }]
+        labels: @json($bulanLabels),
+        datasets: [
+            {
+                label: 'Stok Masuk',
+                data: @json($masukData),
+                backgroundColor: 'rgba(37, 99, 235, 0.5)',
+                borderColor: 'rgb(37, 99, 235)',
+                borderWidth: 2
+            },
+            {
+                label: 'Stok Keluar (Penjualan)',
+                data: @json($keluarData),
+                backgroundColor: 'rgba(239, 68, 68, 0.5)',
+                borderColor: 'rgb(239, 68, 68)',
+                borderWidth: 2
+            }
+        ]
     },
     options: {
         responsive: true,
-        scales: { y: { beginAtZero: true } }
+        scales: { y: { beginAtZero: true } },
+        plugins: {
+            legend: { display: true, position: 'top' }
+        }
     }
 });
 </script>
