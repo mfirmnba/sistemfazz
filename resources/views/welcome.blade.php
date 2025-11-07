@@ -16,11 +16,11 @@
         </div>
 
         {{-- Kotak Login --}}
-        <div class="relative z-10 bg-white/40 backdrop-blur-xl shadow-xl rounded-3xl p-10 text-center border border-black/60 max-w-md w-[90%] transition-transform hover:scale-[1.01] duration-300">
+        <div class="relative z-10 bg-white/50 backdrop-blur-2xl shadow-2xl rounded-3xl p-10 text-center border-2 border-rose-400/70 max-w-md w-[90%] transition-transform hover:scale-[1.01] duration-300 hover:shadow-rose-400/40">
             
             {{-- Logo --}}
             <div class="flex justify-center mb-6">
-                <img src="{{ asset('images/logo.jpg') }}" alt="Logo FazzDrink" class="w-24 h-24 rounded-full shadow-md border-2 border-white/60 object-cover">
+                <img src="{{ asset('images/logo.jpg') }}" alt="Logo FazzDrink" class="w-24 h-24 rounded-full shadow-lg border-2 border-rose-400/70 object-cover">
             </div>
 
             <h1 class="text-4xl md:text-5xl font-bold text-rose-700 drop-shadow-sm mb-6 tracking-wide">
@@ -28,7 +28,7 @@
             </h1>
 
             <a href="{{ route('login') }}"
-               class="inline-block mt-2 px-10 py-3 bg-gradient-to-r from-rose-500 to-red-400 text-black font-semibold rounded-full shadow-md hover:from-rose-600 hover:to-red-500 hover:shadow-lg transition-all duration-300">
+               class="inline-block mt-2 px-10 py-3 bg-gradient-to-r from-rose-500 to-red-400 text-white font-semibold rounded-full shadow-md hover:from-rose-600 hover:to-red-500 hover:shadow-lg transition-all duration-300">
                Masuk Sekarang →
             </a>
         </div>
