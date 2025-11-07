@@ -20,7 +20,7 @@
             
             {{-- Logo --}}
             <div class="flex justify-center mb-6">
-                <img src="{{ asset('images/logo.jpeg') }}" alt="Logo FazzDrink" class="w-24 h-24 rounded-full shadow-lg border-2 border-white/50 object-cover">
+                <img src="{{ asset('images/logo.jpg') }}" alt="Logo FazzDrink" class="w-24 h-24 rounded-full shadow-lg border-2 border-white/50 object-cover">
             </div>
 
             <h1 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg mb-6 tracking-wide">
