@@ -4,29 +4,36 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\LaporanPenjualan;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class ProfitController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // ==============================
-        // 🔹 Hitung Total Profit Keseluruhan
-        // ==============================
+        // Ambil tahun dari request, default tahun sekarang
+        $selectedYear = $request->get('year', Carbon::now()->year);
+
+        // Ambil semua tahun yang tersedia dari data penjualan
+        $availableYears = LaporanPenjualan::selectRaw('YEAR(tanggal) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        // Hitung total profit untuk tahun terpilih
         $totalProfit = LaporanPenjualan::with('minuman')
             ->where('status', 'terjual')
+            ->whereYear('tanggal', $selectedYear)
             ->get()
             ->sum(fn($item) => (($item->minuman->harga ?? 0) - ($item->minuman->hpp ?? 0)) * ($item->jumlah ?? 0));
 
-        // ==============================
-        // 🔹 Siapkan Data Grafik Bulanan
-        // ==============================
+        // Data profit per bulan untuk tahun terpilih
         $monthlyData = LaporanPenjualan::with('minuman')
             ->where('status', 'terjual')
+            ->whereYear('tanggal', $selectedYear)
             ->get()
-            ->groupBy(fn($i) => \Carbon\Carbon::parse($i->tanggal)->format('m'))
-            ->map(function ($items) {
-                return $items->sum(fn($i) => (($i->minuman->harga ?? 0) - ($i->minuman->hpp ?? 0)) * ($i->jumlah ?? 0));
-            });
+            ->groupBy(fn($i) => Carbon::parse($i->tanggal)->format('m'))
+            ->map(fn($items) => $items->sum(fn($i) => (($i->minuman->harga ?? 0) - ($i->minuman->hpp ?? 0)) * ($i->jumlah ?? 0)));
 
         $bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
         $profitData = [];
@@ -36,9 +43,12 @@ class ProfitController extends Controller
             $profitData[] = $monthlyData[$key] ?? 0;
         }
 
-        // ==============================
-        // 🔹 Return ke View
-        // ==============================
-        return view('owner.laporan.profit', compact('totalProfit', 'bulanLabels', 'profitData'));
+        return view('owner.laporan.profit', compact(
+            'selectedYear',
+            'availableYears',
+            'totalProfit',
+            'bulanLabels',
+            'profitData'
+        ));
     }
 }
